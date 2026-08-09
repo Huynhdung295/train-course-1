@@ -1,0 +1,184 @@
+version: '3.8'
+
+# YAML Anchor tái sử dụng cho Log Rotation
+x-logging: &default-logging
+  driver: "json-file"
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  # ==========================================
+  # 🗄️ TẦNG DATABASE (DB_NET) - Ẩn hoàn toàn khỏi Internet
+  # ==========================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: nexus_postgres
+    restart: unless-stopped
+    logging: *default-logging
+    environment:
+      POSTGRES_USER: ${DB_USER:-nexus_admin}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-nexus_secret_pwd}
+      POSTGRES_DB: ${DB_NAME:-nexus_erp}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - db_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-nexus_admin}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PgBouncer: Trạm trung chuyển kết nối Database (Giảm tải RAM)
+  pgbouncer:
+    image: edoburu/pgbouncer:latest
+    container_name: nexus_pgbouncer
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: "postgres://${DB_USER:-nexus_admin}:${DB_PASSWORD:-nexus_secret_pwd}@postgres:5432/${DB_NAME:-nexus_erp}"
+      MAX_CLIENT_CONN: 1000
+      DEFAULT_POOL_SIZE: 20
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - app_net
+      - db_net
+    # Không expose ra ngoài, chỉ cho app_net gọi
+
+  redis:
+    image: redis/redis-stack-server:latest
+    container_name: nexus_redis
+    restart: unless-stopped
+    logging: *default-logging
+    volumes:
+      - redis_data:/data
+    networks:
+      - app_net
+      - db_net
+
+  zookeeper:
+    image: bitnami/zookeeper:latest
+    container_name: nexus_zookeeper
+    restart: unless-stopped
+    logging: *default-logging
+    environment:
+      ALLOW_ANONYMOUS_LOGIN: "yes"
+    networks:
+      - app_net
+
+  kafka:
+    image: bitnami/kafka:latest
+    container_name: nexus_kafka
+    restart: unless-stopped
+    logging: *default-logging
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_CFG_ZOOKEEPER_CONNECT: zookeeper:2181
+      ALLOW_PLAINTEXT_LISTENER: "yes"
+      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+    networks:
+      - app_net
+
+  # Kafka UI: Quản lý Topic
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: nexus_kafka_ui
+    restart: unless-stopped
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+    ports:
+      - "127.0.0.1:8081:8080" # Chỉ truy cập được qua Nginx hoặc Local
+    networks:
+      - app_net
+
+  # ==========================================
+  # 🚀 TẦNG APPLICATION (APP_NET & WEB_NET)
+  # ==========================================
+  backend:
+    image: registry.nexus.com/backend-api:latest
+    container_name: nexus_backend
+    restart: unless-stopped
+    logging: *default-logging
+    depends_on:
+      pgbouncer:
+        condition: service_started
+    environment:
+      # TRỎ VÀO PGBOUNCER THAY VÌ POSTGRES TRỰC TIẾP
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://pgbouncer:6432/${DB_NAME:-nexus_erp}
+      - SPRING_DATASOURCE_USERNAME=${DB_USER:-nexus_admin}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD:-nexus_secret_pwd}
+      - SPRING_REDIS_HOST=redis
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    networks:
+      - app_net
+      - web_net
+
+  frontend:
+    image: registry.nexus.com/frontend-web:latest
+    container_name: nexus_frontend
+    restart: unless-stopped
+    logging: *default-logging
+    environment:
+      - NEXT_PUBLIC_API_URL=${API_URL:-https://api.nexus.com}
+      - INTERNAL_API_URL=http://backend:8080
+    networks:
+      - web_net
+
+  # ==========================================
+  # 👁️ TẦNG OBSERVABILITY (Giám sát Server)
+  # ==========================================
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: nexus_prometheus
+    restart: unless-stopped
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    networks:
+      - app_net
+  
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: nexus_node_exporter
+    restart: unless-stopped
+    pid: host
+    volumes:
+      - /:/host:ro,rslave
+    networks:
+      - app_net
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: nexus_grafana
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3001:3000" # Chỉ truy cập qua Nginx
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PWD:-admin123}
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - app_net
+
+# ==========================================
+# KHAI BÁO MẠNG ĐA TẦNG VÀ VOLUME
+# ==========================================
+networks:
+  web_net:
+    driver: bridge
+  app_net:
+    driver: bridge
+  db_net:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
+  prometheus_data:
+  grafana_data:

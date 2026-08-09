@@ -1,0 +1,39 @@
+name: Deploy Node.js Microservice
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  REGISTRY: registry.nexus.com
+  IMAGE_NAME: backend-node-service
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Log in to Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.REGISTRY_USER }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: Build and push Docker image
+        run: |
+          docker build -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} .
+          docker push ${{ env.REGISTRY }}/${{ env.REGISTRY }}:${{ github.sha }}
+
+      - name: SSH to VPS and Deploy
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.VPS_IP }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /opt/nexus/source_infra/vps_deploy
+            export NODE_TAG=${{ github.sha }}
+            ./scripts/deploy.sh

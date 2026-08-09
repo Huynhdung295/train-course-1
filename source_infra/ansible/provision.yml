@@ -1,0 +1,68 @@
+---
+- name: 🚀 Thiết lập Hạ tầng Nexus VPS (Enterprise Standard)
+  hosts: all
+  become: yes
+  tasks:
+
+    - name: Cập nhật hệ điều hành
+      apt:
+        update_cache: yes
+        upgrade: dist
+
+    - name: Cài đặt các gói phụ trợ (curl, git, htop, jq)
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+          - git
+          - htop
+          - jq
+        state: present
+
+    - name: Thêm Docker GPG key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Thêm Docker APT repository
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
+        state: present
+
+    - name: Cài đặt Docker và Docker Compose Plugin
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-compose-plugin
+        state: present
+
+    - name: Đảm bảo Docker đang chạy
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Thiết lập UFW Firewall (Chặn mọi cổng trừ 80, 443 và SSH)
+      ufw:
+        rule: allow
+        port: '{{ item }}'
+        proto: tcp
+      loop:
+        - "80"
+        - "443"
+        - "22" # Note: Nếu đổi cổng SSH thì đổi biến này
+
+    - name: Bật Firewall
+      ufw:
+        state: enabled
+
+    - name: Đặt lịch Crontab cho Backup tự động (Lúc 2h sáng)
+      cron:
+        name: "Nexus DB Backup"
+        minute: "0"
+        hour: "2"
+        job: "/opt/nexus/source_infra/vps_deploy/scripts/cronjob_backup.sh >> /var/log/nexus_backup.log 2>&1"

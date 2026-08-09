@@ -1,0 +1,35 @@
+# Cấu hình Helm Values dành riêng cho Backend Service
+# Dev Backend có thể copy file này vào dự án của họ để tự định nghĩa các tham số môi trường
+# Infra team sẽ tự động đọc file này khi chạy CI/CD
+
+replicaCount: 3
+
+image:
+  repository: registry.nexus.com/backend-api
+  pullPolicy: IfNotPresent
+  tag: "latest" # Sẽ bị ghi đè bởi CI/CD pipeline
+
+env:
+  # Cấu hình Database
+  SPRING_DATASOURCE_URL: "jdbc:postgresql://nexus-postgres.infra.svc.cluster.local:5432/nexus_erp"
+  SPRING_DATASOURCE_USERNAME: "nexus_admin"
+  
+  # Cấu hình Kafka (Topic name)
+  KAFKA_TOPIC_ORDERS: "orders_events_prod"
+  
+  # Cấu hình Keycloak
+  KEYCLOAK_REALM_URL: "https://auth.nexus.com/realms/nexus-b2b"
+
+resources:
+  requests:
+    cpu: 500m
+    memory: 1024Mi
+  limits:
+    cpu: 1000m
+    memory: 2048Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 20
+  targetCPUUtilizationPercentage: 80

@@ -1,0 +1,36 @@
+stages:
+  - test
+  - build
+  - deploy
+
+variables:
+  DOCKER_REGISTRY: registry.nexus.com
+  IMAGE_NAME: $DOCKER_REGISTRY/frontend-web:$CI_COMMIT_SHORT_SHA
+
+test_frontend:
+  stage: test
+  image: node:18-alpine
+  script:
+    - npm ci
+    - npm run lint
+    - npm run test
+
+build_image:
+  stage: build
+  image: docker:20.10.16
+  services:
+    - docker:20.10.16-dind
+  script:
+    - docker login -u $REGISTRY_USER -p $REGISTRY_PASS $DOCKER_REGISTRY
+    - docker build -t $IMAGE_NAME .
+    - docker push $IMAGE_NAME
+
+deploy_production:
+  stage: deploy
+  image: devops/helm-kubectl:latest
+  script:
+    - echo "Deploying to Production Kubernetes..."
+    - kubectl config use-context nexus-infra/production
+    - helm upgrade --install frontend-web ./helm-chart -n production --set image.tag=$CI_COMMIT_SHORT_SHA
+  only:
+    - main

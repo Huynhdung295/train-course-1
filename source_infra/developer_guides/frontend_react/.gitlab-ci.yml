@@ -1,0 +1,26 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  DOCKER_REGISTRY: registry.nexus.com
+  IMAGE_NAME: $DOCKER_REGISTRY/frontend-pos:$CI_COMMIT_SHORT_SHA
+
+build_image:
+  stage: build
+  image: docker:20.10.16
+  services:
+    - docker:20.10.16-dind
+  script:
+    - docker login -u $REGISTRY_USER -p $REGISTRY_PASS $DOCKER_REGISTRY
+    - docker build -t $IMAGE_NAME .
+    - docker push $IMAGE_NAME
+
+deploy_production:
+  stage: deploy
+  image: alpine/curl
+  script:
+    - echo "Triggering VPS Deployment via Webhook..."
+    - curl -X POST -H "Authorization: Bearer $DEPLOY_SECRET" https://deploy.nexus.com/webhook/pos-update
+  only:
+    - main
