@@ -1,0 +1,41 @@
+# ─── TEST PROFILE ─────────────────────────────────────────────────────────────
+# Used by: Integration tests (Testcontainers will override DB/Redis with real values)
+# Do NOT add real passwords here — Testcontainers overwrites them via @DynamicPropertySource
+# ─────────────────────────────────────────────────────────────────────────────
+
+spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisReactiveAutoConfiguration
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop   # Fresh schema per test run
+    show-sql: false
+    properties:
+      hibernate:
+        generate_statistics: false
+
+  flyway:
+    enabled: false   # Tests use Hibernate ddl-auto instead of Flyway
+
+logging:
+  level:
+    root: WARN
+    com.app: INFO
+    org.springframework.security: DEBUG
+
+# Disable rate limiting in tests
+ratelimiting:
+  enabled: false
+
+app:
+  jwt:
+    secret: test-secret-key-min-32-chars-for-hmac-sha256-algorithm
+    access-token-expiry: 3600
+    refresh-token-expiry: 86400
+  cors:
+    allowed-origins:
+      - "http://localhost:3000"

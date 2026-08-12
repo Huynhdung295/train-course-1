@@ -1,0 +1,53 @@
+# Ansible Vault — Encrypted Secrets Template
+# =================================================================
+# HOW TO USE THIS FILE:
+#
+# 1. Copy this file:
+#    cp ansible/vars/vault.yml.example ansible/vars/vault.yml
+#
+# 2. Fill in real values below
+#
+# 3. Encrypt the file with Ansible Vault:
+#    ansible-vault encrypt ansible/vars/vault.yml
+#    (You'll be prompted for a vault password — store it in your password manager)
+#
+# 4. Run playbooks with the vault:
+#    ansible-playbook -i ansible/inventory.ini ansible/provision.yml --ask-vault-pass
+#    OR
+#    ansible-playbook -i ansible/inventory.ini ansible/provision.yml --vault-password-file ~/.vault_pass
+#
+# 5. Edit encrypted secrets later:
+#    ansible-vault edit ansible/vars/vault.yml
+#
+# NEVER commit the decrypted vault.yml to Git!
+# The .gitignore should exclude: ansible/vars/vault.yml
+# =================================================================
+
+# ─── Database ─────────────────────────────────────────────────────────────────
+vault_db_user: nexus_admin
+vault_db_password: REPLACE_WITH_STRONG_PASSWORD_MIN_32_CHARS
+vault_db_name: nexus_erp
+
+# ─── Redis ────────────────────────────────────────────────────────────────────
+vault_redis_password: REPLACE_WITH_REDIS_PASSWORD
+
+# ─── JWT Secrets ──────────────────────────────────────────────────────────────
+# Generate with: openssl rand -hex 32
+vault_jwt_secret: REPLACE_WITH_64_CHAR_HEX_STRING
+vault_jwt_refresh_secret: REPLACE_WITH_ANOTHER_64_CHAR_HEX_STRING
+
+# ─── Keycloak ─────────────────────────────────────────────────────────────────
+vault_keycloak_admin_password: REPLACE_WITH_KEYCLOAK_ADMIN_PASSWORD
+
+# ─── Notification (Email) ─────────────────────────────────────────────────────
+vault_smtp_password: REPLACE_WITH_SMTP_PASSWORD
+
+# ─── Notification (SMS - Twilio) ──────────────────────────────────────────────
+vault_twilio_account_sid: REPLACE_WITH_TWILIO_ACCOUNT_SID
+vault_twilio_auth_token: REPLACE_WITH_TWILIO_AUTH_TOKEN
+
+# ─── Grafana ──────────────────────────────────────────────────────────────────
+vault_grafana_admin_password: REPLACE_WITH_GRAFANA_PASSWORD
+
+# ─── Registry (Docker) ────────────────────────────────────────────────────────
+vault_registry_password: REPLACE_WITH_DOCKER_REGISTRY_PASSWORD

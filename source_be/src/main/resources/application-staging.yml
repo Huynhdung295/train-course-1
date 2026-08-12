@@ -1,0 +1,67 @@
+# ─── STAGING PROFILE ─────────────────────────────────────────────────────────
+# Activated by: SPRING_PROFILES_ACTIVE=staging
+# Purpose: UAT testing environment — matches Production config but with test data.
+# All values MUST come from environment variables (set in CI/CD pipeline or secrets manager).
+# ─────────────────────────────────────────────────────────────────────────────
+
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://staging-db.nexus.internal:5432/nexus_erp_staging}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      leak-detection-threshold: 60000
+
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: validate   # Never auto-modify schema in staging
+
+  data:
+    redis:
+      host: ${REDIS_HOST:staging-redis.nexus.internal}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD}
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BROKERS:staging-kafka.nexus.internal:9092}
+
+  rabbitmq:
+    host: ${RABBITMQ_HOST:staging-rabbitmq.nexus.internal}
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
+
+logging:
+  level:
+    root: INFO
+    com.app: DEBUG          # Verbose for QA debugging
+    org.springframework: WARN
+    org.hibernate.SQL: DEBUG # Show SQL in staging for troubleshooting
+
+app:
+  cors:
+    allowed-origins:
+      - "https://staging.nexus.com"
+      - "https://staging-admin.nexus.com"
+      - "http://localhost:3000"  # Allow local FE dev to hit staging BE
+  jwt:
+    access-token-expiry: 3600   # 1 hour (longer than prod for QA convenience)
+    refresh-token-expiry: 86400 # 24 hours
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,prometheus,info,loggers
+  endpoint:
+    health:
+      show-details: always  # Full health detail for QA team
+
+# Disable rate limiting in staging to allow stress testing
+ratelimiting:
+  enabled: false

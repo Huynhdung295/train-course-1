@@ -92,7 +92,10 @@ function Vps-Menu ($Vps) {
         Write-Host "  3. View Docker Logs    9. PULL Nexus .env" -ForegroundColor White
         Write-Host "  4. SYNC Nginx (Push)   10. Setup GitHub SSH Key" -ForegroundColor White
         Write-Host "  5. System Status       11. ISSUE SSL (Certbot)" -ForegroundColor White
-        Write-Host "  6. CLONE Repo (Apps)   0. Back to VPS List" -ForegroundColor White
+        Write-Host "  6. CLONE Repo (Apps)   12. ROLLBACK (Previous Image)" -ForegroundColor White
+        Write-Host "  -------------------------------------------------" -ForegroundColor Gray
+        Write-Host "  13. BACKUP Database (Manual)   14. View Backup History" -ForegroundColor Magenta
+        Write-Host "  0. Back to VPS List" -ForegroundColor Red
         Write-Host "===================================================" -ForegroundColor Cyan
         
         $Choice = Read-Host "Select Action"
@@ -148,6 +151,35 @@ function Vps-Menu ($Vps) {
             '11' {
                 $Domain = Read-Host "Enter Domain (e.g. nexus.com)"
                 Invoke-Remote $Vps "setup_ssl $Domain"
+                Read-Host "Press Enter"
+            }
+            '12' {
+                Write-Host "" 
+                Write-Host "  ROLLBACK WARNING" -ForegroundColor Yellow
+                Write-Host "  This will restart with the PREVIOUS Docker image." -ForegroundColor Yellow
+                Write-Host "  Use only if the current deployment is broken!" -ForegroundColor Yellow
+                Write-Host ""
+                $Service = Read-Host "Service to rollback [backend/frontend/all]"
+                if ([string]::IsNullOrWhiteSpace($Service)) { $Service = "all" }
+                $Confirm = Read-Host "Type 'yes' to confirm rollback of '$Service'"
+                if ($Confirm -eq 'yes') {
+                    Write-Host "Rolling back $Service..." -ForegroundColor Cyan
+                    ssh -p $($Vps.Port) "$($Vps.User)@$($Vps.Ip)" "cd /opt/nexus/source_infra/vps_deploy && docker compose stop $Service && docker compose up -d $Service && docker compose ps $Service"
+                    Write-Host "Rollback complete. Please verify the system!" -ForegroundColor Green
+                } else {
+                    Write-Host "Rollback cancelled." -ForegroundColor Yellow
+                }
+                Read-Host "Press Enter"
+            }
+            '13' {
+                Write-Host "Starting manual database backup..." -ForegroundColor Cyan
+                ssh -p $($Vps.Port) "$($Vps.User)@$($Vps.Ip)" "/opt/nexus/source_infra/vps_deploy/scripts/cronjob_backup.sh"
+                Write-Host "Backup complete!" -ForegroundColor Green
+                Read-Host "Press Enter"
+            }
+            '14' {
+                Write-Host "Recent backups:" -ForegroundColor Cyan
+                ssh -p $($Vps.Port) "$($Vps.User)@$($Vps.Ip)" "ls -lh /opt/nexus/backups/ 2>/dev/null || echo 'No backups found'"
                 Read-Host "Press Enter"
             }
         }

@@ -1,23 +1,17 @@
 package com.app.users.service;
 
-import com.app.common.security.SecurityUser;
-import com.app.users.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Service;
-
-@Service
-@RequiredArgsConstructor
-public class SecurityUserDetailsService implements UserDetailsService {
-
-    private final UserRepository userRepository;
-
-    @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return userRepository.findByEmail(email)
-            .map(SecurityUser::new)
-            .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
-    }
+/**
+ * @deprecated Replaced by {@link com.app.common.security.UserDetailsServiceImpl}.
+ *
+ * This class was the original UserDetailsService implementation.
+ * It has been superseded by UserDetailsServiceImpl in the common/security package
+ * which includes soft-delete filtering, proper logging, and @Transactional support.
+ *
+ * DO NOT add @Service or @Component annotation here — the bean is already
+ * registered via UserDetailsServiceImpl in com.app.common.security.
+ */
+@SuppressWarnings("unused")
+public class SecurityUserDetailsService {
+    // Intentionally empty — see com.app.common.security.UserDetailsServiceImpl
 }
+

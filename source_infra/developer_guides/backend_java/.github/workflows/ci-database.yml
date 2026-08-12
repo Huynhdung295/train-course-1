@@ -1,0 +1,81 @@
+name: CI — Validate Database Migrations
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'migrations/**'
+      - 'scripts/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'migrations/**'
+
+jobs:
+  validate-migrations:
+    name: Validate SQL Migrations
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: nexus_admin
+          POSTGRES_PASSWORD: ci_test_password
+          POSTGRES_DB: nexus_erp_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate SQL syntax (SQLFluff)
+        run: |
+          pip install sqlfluff
+          sqlfluff lint migrations/ --dialect postgres --format github-annotation || true
+
+      - name: Run Master Migrations (Flyway)
+        run: |
+          docker run --rm \
+            --network host \
+            -v ${{ github.workspace }}/migrations/master:/flyway/sql \
+            flyway/flyway:10 \
+              -url="jdbc:postgresql://localhost:5432/nexus_erp_ci" \
+              -user=nexus_admin \
+              -password=ci_test_password \
+              migrate
+
+      - name: Create test tenant schema
+        run: |
+          psql "postgresql://nexus_admin:ci_test_password@localhost:5432/nexus_erp_ci" \
+            -c "CREATE SCHEMA IF NOT EXISTS tenant_ci_test;"
+
+      - name: Run Tenant Migrations (Flyway)
+        run: |
+          docker run --rm \
+            --network host \
+            -v ${{ github.workspace }}/migrations/tenant:/flyway/sql \
+            flyway/flyway:10 \
+              -url="jdbc:postgresql://localhost:5432/nexus_erp_ci?currentSchema=tenant_ci_test" \
+              -user=nexus_admin \
+              -password=ci_test_password \
+              -schemas=tenant_ci_test \
+              migrate
+
+      - name: Verify migration state
+        run: |
+          docker run --rm \
+            --network host \
+            -v ${{ github.workspace }}/migrations/tenant:/flyway/sql \
+            flyway/flyway:10 \
+              -url="jdbc:postgresql://localhost:5432/nexus_erp_ci?currentSchema=tenant_ci_test" \
+              -user=nexus_admin \
+              -password=ci_test_password \
+              -schemas=tenant_ci_test \
+              info

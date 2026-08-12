@@ -1,0 +1,17 @@
+# ─── Checklist / Notes cá nhân (không track lên Git) ─────────────────────────
+checklist_be_implement.md
+Checklist_BE.md
+
+# ─── Các file notes/draft khác ────────────────────────────────────────────────
+*.draft.md
+TODO.md
+NOTES.md
+
+# ─── OS files ─────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ─── IDE ──────────────────────────────────────────────────────────────────────
+.idea/
+*.iml

@@ -12,34 +12,24 @@ import java.lang.annotation.Target;
 import java.util.UUID;
 
 /**
- * @ValidUUID — Custom Jakarta validation constraint for UUID strings.
+ * @ValidUUID — Validates that a String field contains a properly formatted UUID v4.
  *
- * Usage: @ValidUUID String orderId
+ * Usage:
+ *   @ValidUUID
+ *   private String orderId;
  */
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = ValidUUID.Validator.class)
 public @interface ValidUUID {
-
     String message() default "Invalid UUID format";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 
-    /** If true, null values are considered valid (use @NotNull separately to require) */
-    boolean allowNull() default true;
-
     class Validator implements ConstraintValidator<ValidUUID, String> {
-
-        private boolean allowNull;
-
         @Override
-        public void initialize(ValidUUID annotation) {
-            this.allowNull = annotation.allowNull();
-        }
-
-        @Override
-        public boolean isValid(String value, ConstraintValidatorContext context) {
-            if (value == null) return allowNull;
+        public boolean isValid(String value, ConstraintValidatorContext ctx) {
+            if (value == null || value.isBlank()) return true;
             try {
                 UUID.fromString(value);
                 return true;

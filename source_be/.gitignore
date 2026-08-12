@@ -1,0 +1,49 @@
+# Java / Maven
+target/
+*.class
+*.jar
+*.war
+
+# IDE — IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# IDE — VS Code (giữ lại .vscode/ để chia sẻ run config)
+.vscode/*.log
+
+# IDE — Eclipse
+.settings/
+.classpath
+.project
+.factorypath
+bin/
+
+# Environment & Secrets — KHÔNG BAO GIỜ commit những file này!
+.env
+.env.local
+.env.prod
+.env.staging
+*.secret
+vault.yml
+# Giữ lại .env.example để người mới clone biết cần set gì
+!.env.example
+
+# Spring Boot
+spring.log
+*.log
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Maven wrapper
+!.mvn/
+.mvn/repository/
+
+# Docker
+docker-data/
