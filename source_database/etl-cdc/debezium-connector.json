@@ -1,0 +1,37 @@
+{
+  "name": "nexus-postgres-cdc",
+  "config": {
+    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+    "plugin.name": "pgoutput",
+    "tasks.max": "1",
+    
+    "database.hostname": "postgres",
+    "database.port": "5432",
+    "database.user": "nexus_admin",
+    "database.password": "${DB_PASSWORD}",
+    "database.dbname": "nexus_erp",
+    "database.server.name": "nexus",
+    
+    "slot.name": "nexus_debezium_slot",
+    "publication.name": "nexus_publication",
+
+    "schema.include.list": "tenant_.*",
+    "table.include.list": "tenant_.*.orders,tenant_.*.payments,tenant_.*.inventory,tenant_.*.products",
+
+    "topic.prefix": "nexus.cdc",
+
+    "transforms": "route,addTenantId",
+    "transforms.route.type": "org.apache.kafka.connect.transforms.ReplaceField$Value",
+    
+    "transforms.addTenantId.type": "org.apache.kafka.connect.transforms.InsertField$Value",
+    "transforms.addTenantId.static.field": "tenant_schema",
+    "transforms.addTenantId.static.value": "${schema}",
+
+    "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter.schemas.enable": "false",
+
+    "heartbeat.interval.ms": "10000",
+    "snapshot.mode": "initial"
+  }
+}
