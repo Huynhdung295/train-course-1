@@ -1,0 +1,122 @@
+<div class="app-shell" [class.sidebar-collapsed]="sidebarCollapsed()">
+
+      <!-- ── Sidebar ───────────────────────────────────────────────── -->
+      <aside class="sidebar" role="navigation" aria-label="Main navigation">
+        <!-- Tenant branding -->
+        <div class="sidebar__header">
+          @if (tenantStore.logo()) {
+            <img [src]="tenantStore.logo()" [alt]="tenantStore.companyName()" class="sidebar__logo" />
+          } @else {
+            <div class="sidebar__logo-fallback">
+              <span>{{ tenantStore.companyName().charAt(0) }}</span>
+            </div>
+          }
+          @if (!sidebarCollapsed()) {
+            <span class="sidebar__company-name">{{ tenantStore.companyName() }}</span>
+          }
+        </div>
+
+        <!-- Navigation -->
+        <nav class="sidebar__nav">
+          <ul role="list">
+            @for (item of navItems; track item.route) {
+              <li>
+                <a
+                  [routerLink]="item.route"
+                  routerLinkActive="sidebar__nav-item--active"
+                  class="sidebar__nav-item"
+                  [attr.aria-label]="item.label"
+                  [title]="sidebarCollapsed() ? item.label : ''"
+                >
+                  <span class="sidebar__nav-icon">{{ item.icon }}</span>
+                  @if (!sidebarCollapsed()) {
+                    <span class="sidebar__nav-label">{{ item.label }}</span>
+                    @if (item.badge && item.badge()) {
+                      <span class="sidebar__nav-badge">{{ item.badge() }}</span>
+                    }
+                  }
+                </a>
+              </li>
+            }
+          </ul>
+        </nav>
+
+        <!-- Collapse toggle -->
+        <button
+          class="sidebar__toggle"
+          (click)="toggleSidebar()"
+          [attr.aria-label]="sidebarCollapsed() ? 'Mở rộng menu' : 'Thu gọn menu'"
+        >
+          {{ sidebarCollapsed() ? '→' : '←' }}
+        </button>
+      </aside>
+
+      <!-- ── Main area ─────────────────────────────────────────────── -->
+      <div class="main-area">
+        <!-- Header -->
+        <header class="header" role="banner">
+          <div class="header__left">
+            <!-- Page title injected via router data -->
+          </div>
+
+          <div class="header__right">
+            <!-- Realtime connection status -->
+            <div
+              class="connection-badge"
+              [class.connection-badge--connected]="realtimeService.status() === 'connected'"
+              [attr.aria-label]="'Kết nối: ' + realtimeService.status()"
+              title="Kết nối realtime"
+            >
+              <span class="connection-badge__dot"></span>
+              @if (realtimeService.status() === 'connected') {
+                <span>Live</span>
+              }
+            </div>
+
+            <!-- Global loading indicator -->
+            @if (loadingService.isLoading()) {
+              <div class="header__loading" role="progressbar" aria-label="Đang tải...">
+                <div class="loading-bar"></div>
+              </div>
+            }
+
+            <!-- User avatar menu -->
+            <div class="user-menu">
+              <button
+                class="user-menu__trigger"
+                (click)="toggleUserMenu()"
+                [attr.aria-expanded]="userMenuOpen()"
+                aria-haspopup="true"
+                id="user-menu-btn"
+              >
+                <div class="user-avatar">
+                  {{ authStore.fullName().charAt(0).toUpperCase() }}
+                </div>
+                @if (!sidebarCollapsed()) {
+                  <div class="user-info">
+                    <span class="user-info__name">{{ authStore.fullName() }}</span>
+                    <span class="user-info__role">{{ authStore.roles()[0] | slice:5 }}</span>
+                  </div>
+                }
+              </button>
+
+              @if (userMenuOpen()) {
+                <div class="user-menu__dropdown" role="menu">
+                  <a routerLink="/settings" role="menuitem" (click)="closeUserMenu()">
+                    ⚙️ Cài đặt
+                  </a>
+                  <button role="menuitem" (click)="logout()">
+                    🚪 Đăng xuất
+                  </button>
+                </div>
+              }
+            </div>
+          </div>
+        </header>
+
+        <!-- Router outlet -->
+        <main class="main-content" role="main" id="main-content">
+          <router-outlet />
+        </main>
+      </div>
+    </div>

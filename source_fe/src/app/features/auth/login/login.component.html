@@ -1,0 +1,96 @@
+<div class="login">
+      <h1 class="login__title">Đăng nhập</h1>
+      <p class="login__subtitle">Chào mừng bạn trở lại 👋</p>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="login__form" novalidate>
+
+        <!-- Email -->
+        <div class="form-group" [class.form-group--error]="emailErrors">
+          <label for="email" class="form-label">Email</label>
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            class="form-input"
+            placeholder="email@company.com"
+            autocomplete="email"
+            [attr.aria-describedby]="emailErrors ? 'email-error' : null"
+          />
+          @if (emailErrors) {
+            <p id="email-error" class="form-error" role="alert">{{ emailErrors }}</p>
+          }
+        </div>
+
+        <!-- Password -->
+        <div class="form-group" [class.form-group--error]="passwordErrors">
+          <label for="password" class="form-label">Mật khẩu</label>
+          <div class="form-input-group">
+            <input
+              id="password"
+              [type]="showPassword() ? 'text' : 'password'"
+              formControlName="password"
+              class="form-input"
+              placeholder="••••••••"
+              autocomplete="current-password"
+              [attr.aria-describedby]="passwordErrors ? 'password-error' : null"
+            />
+            <button
+              type="button"
+              class="form-input-addon"
+              (click)="showPassword.update(v => !v)"
+              [attr.aria-label]="showPassword() ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'"
+            >
+              {{ showPassword() ? '🙈' : '👁️' }}
+            </button>
+          </div>
+          @if (passwordErrors) {
+            <p id="password-error" class="form-error" role="alert">{{ passwordErrors }}</p>
+          }
+        </div>
+
+        <!-- Remember me + Forgot password -->
+        <div class="login__options">
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="rememberMe" />
+            <span>Nhớ mật khẩu</span>
+          </label>
+          <a routerLink="/auth/forgot-password" class="link">Quên mật khẩu?</a>
+        </div>
+
+        <!-- Global server error -->
+        @if (serverError()) {
+          <div class="form-error-banner" role="alert">
+            ❌ {{ serverError() }}
+          </div>
+        }
+
+        <!-- Submit -->
+        <button
+          type="submit"
+          class="btn btn--primary btn--full"
+          [disabled]="form.invalid || submitting()"
+          [attr.aria-busy]="submitting()"
+          id="login-submit-btn"
+        >
+          @if (submitting()) {
+            <span class="btn__spinner"></span>
+            <span>Đang đăng nhập...</span>
+          } @else {
+            <span>Đăng nhập</span>
+          }
+        </button>
+
+        <!-- Divider -->
+        <div class="divider"><span>hoặc</span></div>
+
+        <!-- SSO -->
+        <button
+          type="button"
+          class="btn btn--outline btn--full"
+          (click)="loginWithSSO()"
+          id="sso-btn"
+        >
+          🔐 Đăng nhập với SSO
+        </button>
+      </form>
+    </div>

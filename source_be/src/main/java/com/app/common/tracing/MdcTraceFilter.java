@@ -71,7 +71,8 @@ public class MdcTraceFilter extends OncePerRequestFilter {
     private void populateUserContext() {
         try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            if (auth != null && auth.getPrincipal() instanceof SecurityUser securityUser) {
+            if (auth != null && auth.getPrincipal() instanceof SecurityUser) {
+                SecurityUser securityUser = (SecurityUser) auth.getPrincipal();
                 MDC.put("userId", securityUser.getUserId().toString());
                 MDC.put("tenantId", securityUser.getTenantId());
             }

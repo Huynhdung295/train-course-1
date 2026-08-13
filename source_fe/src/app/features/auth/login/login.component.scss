@@ -1,0 +1,218 @@
+// =============================================================================
+// Shared Form Styles — Used across all feature forms
+// =============================================================================
+
+.login {
+  &__title {
+    font-size: var(--text-2xl);
+    font-weight: var(--font-bold);
+    color: var(--text-primary);
+    margin-bottom: var(--space-1);
+  }
+
+  &__subtitle {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    margin-bottom: var(--space-8);
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+
+  &__options {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: var(--text-sm);
+  }
+}
+
+// ── Form primitives ───────────────────────────────────────────────────────────
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+
+  &--error {
+    .form-input,
+    .form-input-group .form-input {
+      border-color: var(--color-danger);
+      &:focus { box-shadow: 0 0 0 3px hsla(0, 84%, 60%, 0.3); }
+    }
+  }
+}
+
+.form-label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--text-secondary);
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.625rem var(--space-3);
+  background: var(--bg-base);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  outline: none;
+
+  &::placeholder { color: var(--text-tertiary); }
+
+  &:focus {
+    border-color: var(--color-primary);
+    box-shadow: var(--focus-ring);
+  }
+}
+
+.form-input-group {
+  display: flex;
+  position: relative;
+
+  .form-input { padding-right: 2.5rem; }
+}
+
+.form-input-addon {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-tertiary);
+  font-size: var(--text-base);
+  transition: color var(--transition-fast);
+
+  &:hover { color: var(--text-primary); }
+}
+
+.form-error {
+  font-size: var(--text-xs);
+  color: var(--color-danger);
+}
+
+.form-error-banner {
+  padding: var(--space-3) var(--space-4);
+  background: hsla(0, 84%, 60%, 0.1);
+  border: 1px solid hsla(0, 84%, 60%, 0.25);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  color: hsl(0, 84%, 70%);
+}
+
+// ── Buttons ───────────────────────────────────────────────────────────────────
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: 0.625rem var(--space-4);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all var(--transition-fast);
+  outline: none;
+  white-space: nowrap;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &--primary {
+    background: var(--color-primary);
+    color: #fff;
+    border-color: var(--color-primary);
+
+    &:hover:not(:disabled) {
+      background: var(--color-primary-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px hsla(239, 84%, 67%, 0.4);
+    }
+  }
+
+  &--outline {
+    background: transparent;
+    color: var(--text-secondary);
+    border-color: var(--border-default);
+
+    &:hover:not(:disabled) {
+      background: var(--hover-overlay);
+      color: var(--text-primary);
+      border-color: var(--border-strong);
+    }
+  }
+
+  &--danger {
+    background: var(--color-danger);
+    color: #fff;
+
+    &:hover:not(:disabled) { filter: brightness(1.1); }
+  }
+
+  &--full { width: 100%; }
+
+  &--sm { padding: var(--space-1) var(--space-3); font-size: var(--text-xs); }
+  &--lg { padding: 0.75rem var(--space-6); font-size: var(--text-md); }
+}
+
+.btn__spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+// ── Misc ──────────────────────────────────────────────────────────────────────
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--text-tertiary);
+  font-size: var(--text-xs);
+
+  &::before, &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border-subtle);
+  }
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+
+  input[type="checkbox"] { accent-color: var(--color-primary); }
+}
+
+.link {
+  font-size: var(--text-sm);
+  color: var(--color-primary);
+
+  &:hover { text-decoration: underline; }
+}

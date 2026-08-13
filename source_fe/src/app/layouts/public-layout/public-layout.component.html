@@ -1,0 +1,43 @@
+<div class="public-layout">
+      <!-- Navbar -->
+      <header class="public-navbar">
+        <div class="public-navbar__brand">
+          <div class="logo-icon">N</div>
+          <span class="logo-text">Nexus ERP</span>
+        </div>
+        <nav class="public-navbar__links">
+          <a routerLink="/" class="nav-link">Trang chủ</a>
+          <a routerLink="/features" class="nav-link">Tính năng</a>
+          <a routerLink="/pricing" class="nav-link">Bảng giá</a>
+          <a routerLink="/track-order" class="nav-link">Tra cứu đơn</a>
+        </nav>
+        <div class="public-navbar__actions">
+          <a routerLink="/auth/login" class="btn btn--outline" style="border-radius: 20px;">Đăng nhập</a>
+          <button class="btn btn--primary" style="border-radius: 20px;">Dùng thử miễn phí</button>
+        </div>
+      </header>
+
+      <!-- Main Content -->
+      <main class="public-main">
+        <router-outlet></router-outlet>
+      </main>
+
+      <!-- Footer -->
+      <footer class="public-footer">
+        <div class="footer-content">
+          <div class="footer-brand">
+            <span class="logo-text">Nexus ERP</span>
+            <p class="text-muted text-sm mt-2">Nền tảng quản trị doanh nghiệp toàn diện thế hệ mới.</p>
+          </div>
+          <div class="footer-links">
+            <a href="#">Về chúng tôi</a>
+            <a href="#">Điều khoản</a>
+            <a href="#">Bảo mật</a>
+            <a href="#">Hỗ trợ</a>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p class="text-sm text-muted">© 2026 Nexus Corporation. All rights reserved.</p>
+        </div>
+      </footer>
+    </div>

@@ -1,0 +1,28 @@
+<div class="toast-container" role="region" aria-label="Notifications" aria-live="polite">
+      @for (toast of toastService.toasts(); track toast.id) {
+        <div
+          class="toast toast--{{ toast.type }}"
+          [@slideIn]
+          role="alert"
+          [attr.aria-live]="toast.type === 'error' ? 'assertive' : 'polite'"
+        >
+          <div class="toast__icon">{{ getIcon(toast.type) }}</div>
+          <div class="toast__body">
+            <p class="toast__title">{{ toast.title }}</p>
+            @if (toast.message) {
+              <p class="toast__message">{{ toast.message }}</p>
+            }
+            @if (toast.traceId) {
+              <p class="toast__trace">Trace ID: {{ toast.traceId }}</p>
+            }
+          </div>
+          <button
+            class="toast__close"
+            (click)="toastService.dismiss(toast.id)"
+            [attr.aria-label]="'Đóng thông báo: ' + toast.title"
+          >
+            ✕
+          </button>
+        </div>
+      }
+    </div>

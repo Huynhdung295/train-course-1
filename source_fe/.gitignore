@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+.yarn/
+
+# Build output
+dist/
+.angular/
+
+# Environment & secrets — NEVER commit these
+.env
+.env.local
+.env.staging
+.env.prod
+!.env.example
+
+# IDE
+.idea/
+*.iml
+.vscode/*.log
+# Keep .vscode/launch.json and .vscode/settings.json
+!.vscode/launch.json
+!.vscode/settings.json
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Test output
+coverage/
+playwright-report/
+test-results/
+
+# Logs
+*.log
+logs/
+
+# Cache
+.eslintcache
+.prettiercache

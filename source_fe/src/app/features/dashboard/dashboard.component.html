@@ -1,0 +1,85 @@
+<div class="dashboard">
+      <!-- Page header -->
+      <div class="page-header">
+        <div>
+          <h1 class="page-header__title">Dashboard</h1>
+          <p class="page-header__subtitle">Tổng quan hoạt động kinh doanh hôm nay</p>
+        </div>
+        <div class="page-header__actions">
+          <span class="text-sm text-muted">Cập nhật: {{ lastUpdated() | relativeTime }}</span>
+        </div>
+      </div>
+
+      <!-- KPI Cards -->
+      <div class="kpi-grid">
+        @for (card of kpiCards(); track card.label) {
+          <div class="kpi-card">
+            <div class="kpi-card__icon" [style.background]="card.color + '20'" [style.color]="card.color">
+              {{ card.icon }}
+            </div>
+            <div class="kpi-card__body">
+              <p class="kpi-card__label">{{ card.label }}</p>
+              <p class="kpi-card__value">{{ card.value }}</p>
+              @if (card.delta) {
+                <p class="kpi-card__delta text-success text-xs">{{ card.delta }}</p>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Bottom row -->
+      <div class="dashboard__grid-2">
+
+        <!-- Recent orders -->
+        <div class="card">
+          <div class="d-flex items-center justify-between" style="margin-bottom: 1rem">
+            <h2 class="h4">Đơn hàng gần đây</h2>
+            <a routerLink="/orders" class="btn btn--sm btn--outline">Xem tất cả</a>
+          </div>
+
+          @if (recentOrders().length === 0) {
+            <div class="empty-state">
+              <span class="empty-state__icon">📋</span>
+              <p>Chưa có đơn hàng nào hôm nay</p>
+            </div>
+          } @else {
+            <div class="order-list">
+              @for (order of recentOrders(); track order.id) {
+                <div class="order-row">
+                  <div class="order-row__main">
+                    <span class="order-row__number">#{{ order.orderNumber }}</span>
+                    <span class="order-row__customer text-muted text-sm">{{ order.customerName || 'Khách lẻ' }}</span>
+                  </div>
+                  <div class="order-row__meta">
+                    <span class="order-row__total">{{ order.total | currencyVnd }}</span>
+                    <span class="badge badge--{{ getStatusColor(order.status) }}">{{ order.status }}</span>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Low stock alerts -->
+        <div class="card">
+          <h2 class="h4" style="margin-bottom: 1rem">⚠️ Cảnh báo tồn kho</h2>
+
+          @if (lowStockItems().length === 0) {
+            <div class="empty-state">
+              <span class="empty-state__icon">✅</span>
+              <p>Tồn kho ổn định</p>
+            </div>
+          } @else {
+            <div class="stock-list">
+              @for (item of lowStockItems(); track item.id) {
+                <div class="stock-row">
+                  <span class="stock-row__name">{{ item.name }}</span>
+                  <span class="badge badge--warning">{{ item.stock }} còn lại</span>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </div>

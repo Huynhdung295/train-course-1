@@ -1,0 +1,57 @@
+<div class="mfa">
+      <h1 class="login__title">Xác thực 2 bước</h1>
+      <p class="login__subtitle">
+        Nhập mã 6 chữ số từ ứng dụng xác thực của bạn
+      </p>
+
+      @if (countdown() > 0) {
+        <div class="mfa__countdown">
+          <span class="mfa__countdown-ring">{{ countdown() }}</span>
+          <span class="text-muted text-sm">giây còn lại</span>
+        </div>
+      } @else {
+        <div class="form-error-banner" role="alert">
+          Mã OTP đã hết hạn. Vui lòng thử lại.
+        </div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="mfa__form" novalidate>
+        <div class="mfa__inputs" (paste)="onPaste($event)">
+          @for (ctrl of otpControls; track $index) {
+            <input
+              type="text"
+              inputmode="numeric"
+              maxlength="1"
+              pattern="[0-9]"
+              class="mfa__input"
+              [formControl]="ctrl"
+              [id]="'otp-' + $index"
+              (input)="onInput($event, $index)"
+              (keydown)="onKeydown($event, $index)"
+              autocomplete="one-time-code"
+            />
+          }
+        </div>
+
+        @if (serverError()) {
+          <div class="form-error-banner" role="alert">❌ {{ serverError() }}</div>
+        }
+
+        <button
+          type="submit"
+          class="btn btn--primary btn--full"
+          [disabled]="!isComplete() || submitting()"
+          id="mfa-verify-btn"
+        >
+          @if (submitting()) {
+            <span class="btn__spinner"></span> Đang xác thực...
+          } @else {
+            Xác nhận
+          }
+        </button>
+
+        <button type="button" class="btn btn--outline btn--full" (click)="goBack()">
+          ← Quay lại đăng nhập
+        </button>
+      </form>
+    </div>

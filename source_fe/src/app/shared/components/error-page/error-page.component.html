@@ -1,0 +1,11 @@
+<div class="error-page">
+      <div class="error-page__content">
+        <div class="error-page__code">{{ errorCode() }}</div>
+        <h1 class="error-page__title">{{ title() }}</h1>
+        <p class="error-page__message">{{ message() }}</p>
+        <div class="error-page__actions">
+          <a routerLink="/dashboard" class="btn btn--primary">← Về Dashboard</a>
+          <button class="btn btn--outline" (click)="goBack()">Quay lại</button>
+        </div>
+      </div>
+    </div>

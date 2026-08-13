@@ -1,0 +1,162 @@
+<div class="pos">
+
+      <!-- ── Left: Product search ──────────────────────────────────── -->
+      <div class="pos__products">
+        <div class="pos__search-bar">
+          <input
+            type="search"
+            class="form-input pos__search-input"
+            placeholder="🔍 Tìm sản phẩm, quét barcode..."
+            [formControl]="searchControl"
+            id="pos-search"
+            (keyup.enter)="searchProducts()"
+          />
+          <button class="btn btn--primary" (click)="searchProducts()" id="pos-search-btn">
+            Tìm
+          </button>
+        </div>
+
+        <!-- Product grid -->
+        @if (searchLoading()) {
+          <div class="product-grid">
+            @for (i of [1,2,3,4,5,6]; track i) {
+              <div class="skeleton" style="height: 120px; border-radius: var(--radius-md)"></div>
+            }
+          </div>
+        } @else if (searchResults().length > 0) {
+          <div class="product-grid">
+            @for (product of searchResults(); track product.id) {
+              <button
+                class="product-card"
+                (click)="cartStore.addProduct(product)"
+                [disabled]="product.stockQuantity === 0"
+                [attr.aria-label]="'Thêm ' + product.name + ' vào giỏ'"
+              >
+                <div class="product-card__image">
+                  @if (product.images[0]?.url) {
+                    <img [src]="product.images[0].url" [alt]="product.name" />
+                  } @else {
+                    <span>📦</span>
+                  }
+                </div>
+                <p class="product-card__name">{{ product.name }}</p>
+                <p class="product-card__price">{{ product.price | currencyVnd }}</p>
+                <p class="product-card__stock text-xs" [class.text-danger]="product.stockQuantity === 0">
+                  Còn: {{ product.stockQuantity }}
+                </p>
+              </button>
+            }
+          </div>
+        } @else if (searched()) {
+          <div class="empty-state">
+            <span class="empty-state__icon">🔍</span>
+            <p>Không tìm thấy sản phẩm</p>
+          </div>
+        } @else {
+          <div class="empty-state">
+            <span class="empty-state__icon">🛒</span>
+            <p>Tìm kiếm hoặc quét barcode để thêm sản phẩm</p>
+          </div>
+        }
+      </div>
+
+      <!-- ── Right: Cart + Checkout ────────────────────────────────── -->
+      <div class="pos__cart">
+        <div class="pos__cart-header">
+          <h2 class="h4">Giỏ hàng</h2>
+          @if (!cartStore.isEmpty()) {
+            <button class="btn btn--sm btn--outline" (click)="cartStore.clearCart()" id="clear-cart-btn">
+              Xóa tất cả
+            </button>
+          }
+        </div>
+
+        <!-- Cart items -->
+        <div class="cart-items">
+          @if (cartStore.isEmpty()) {
+            <div class="empty-state" style="padding: var(--space-8)">
+              <span class="empty-state__icon">🛒</span>
+              <p class="text-sm">Giỏ hàng trống</p>
+            </div>
+          } @else {
+            @for (item of cartStore.items(); track item.productId) {
+              <div class="cart-item">
+                <div class="cart-item__info">
+                  <p class="cart-item__name">{{ item.name }}</p>
+                  <p class="cart-item__price text-muted text-xs">{{ item.unitPrice | currencyVnd }} / {{ 'cái' }}</p>
+                </div>
+                <div class="cart-item__controls">
+                  <button
+                    class="qty-btn"
+                    (click)="cartStore.updateQuantity(item.productId, item.quantity - 1)"
+                    [attr.aria-label]="'Giảm số lượng ' + item.name"
+                  >−</button>
+                  <span class="qty-display">{{ item.quantity }}</span>
+                  <button
+                    class="qty-btn"
+                    (click)="cartStore.updateQuantity(item.productId, item.quantity + 1)"
+                    [disabled]="item.quantity >= item.stock"
+                    [attr.aria-label]="'Tăng số lượng ' + item.name"
+                  >+</button>
+                </div>
+                <p class="cart-item__total">{{ (item.unitPrice * item.quantity) | currencyVnd }}</p>
+                <button
+                  class="cart-item__remove"
+                  (click)="cartStore.removeItem(item.productId)"
+                  [attr.aria-label]="'Xóa ' + item.name"
+                >✕</button>
+              </div>
+            }
+          }
+        </div>
+
+        <!-- Order summary -->
+        @if (!cartStore.isEmpty()) {
+          <div class="order-summary">
+            <div class="order-summary__row">
+              <span>Tạm tính</span>
+              <span>{{ cartStore.subtotal() | currencyVnd }}</span>
+            </div>
+            @if (cartStore.totalDiscount() > 0) {
+              <div class="order-summary__row text-success">
+                <span>Giảm giá</span>
+                <span>-{{ cartStore.totalDiscount() | currencyVnd }}</span>
+              </div>
+            }
+            <div class="order-summary__row order-summary__total">
+              <span>Tổng cộng</span>
+              <span>{{ cartStore.total() | currencyVnd }}</span>
+            </div>
+          </div>
+
+          <!-- Payment method -->
+          <div class="payment-methods">
+            @for (method of paymentMethods; track method.value) {
+              <button
+                class="payment-btn"
+                [class.payment-btn--active]="cartStore.paymentMethod() === method.value"
+                (click)="cartStore.setPaymentMethod(method.value)"
+                [id]="'pay-' + method.value.toLowerCase()"
+              >
+                {{ method.icon }} {{ method.label }}
+              </button>
+            }
+          </div>
+
+          <!-- Checkout -->
+          <button
+            class="btn btn--primary btn--full pos__checkout-btn"
+            (click)="checkout()"
+            [disabled]="checkoutLoading() || cartStore.hasOutOfStock()"
+            id="checkout-btn"
+          >
+            @if (checkoutLoading()) {
+              <span class="btn__spinner"></span>
+              <span>Đang xử lý...</span>
+            } @else {
+              <span>💳 Thanh toán {{ cartStore.total() | currencyVnd }}</span>
+            }
+          </button>
+        }
+      </div>
+    </div>

@@ -1,0 +1,152 @@
+// =============================================================================
+// Design Tokens — All CSS Custom Properties
+// Defined on :root, overridden per .dark-theme / .light-theme
+//
+// Naming convention: --[category]-[modifier]
+// =============================================================================
+
+:root {
+  // ── Typography ──────────────────────────────────────────────────────────────
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+
+  --text-xs:   0.6875rem;   // 11px
+  --text-sm:   0.8125rem;   // 13px
+  --text-base: 0.9375rem;   // 15px
+  --text-md:   1rem;        // 16px
+  --text-lg:   1.125rem;    // 18px
+  --text-xl:   1.25rem;     // 20px
+  --text-2xl:  1.5rem;      // 24px
+  --text-3xl:  1.875rem;    // 30px
+  --text-4xl:  2.25rem;     // 36px
+
+  --font-light:    300;
+  --font-normal:   400;
+  --font-medium:   500;
+  --font-semibold: 600;
+  --font-bold:     700;
+
+  --leading-tight:  1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed:1.75;
+
+  // ── Spacing ─────────────────────────────────────────────────────────────────
+  --space-1:  0.25rem;    // 4px
+  --space-2:  0.5rem;     // 8px
+  --space-3:  0.75rem;    // 12px
+  --space-4:  1rem;       // 16px
+  --space-5:  1.25rem;    // 20px
+  --space-6:  1.5rem;     // 24px
+  --space-8:  2rem;       // 32px
+  --space-10: 2.5rem;     // 40px
+  --space-12: 3rem;       // 48px
+  --space-16: 4rem;       // 64px
+
+  // ── Border radius ───────────────────────────────────────────────────────────
+  --radius-sm:   0.25rem;   // 4px
+  --radius-md:   0.5rem;    // 8px
+  --radius-lg:   0.75rem;   // 12px
+  --radius-xl:   1rem;      // 16px
+  --radius-2xl:  1.5rem;    // 24px
+  --radius-full: 9999px;
+
+  // ── Z-index ─────────────────────────────────────────────────────────────────
+  --z-base:    0;
+  --z-raised:  10;
+  --z-sticky:  100;
+  --z-sidebar: 200;
+  --z-modal:   300;
+  --z-toast:   400;
+  --z-tooltip: 500;
+
+  // ── Transitions ─────────────────────────────────────────────────────────────
+  --transition-fast:   150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow:   400ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  // ── Semantic colors (overridden by theme) ────────────────────────────────────
+  --color-primary:    hsl(239, 84%, 67%);    // Indigo 500
+  --color-primary-hover: hsl(239, 84%, 60%);
+  --color-secondary:  hsl(262, 52%, 56%);    // Violet 500
+  --color-accent:     hsl(199, 89%, 48%);    // Cyan 500
+  --color-success:    hsl(142, 71%, 45%);    // Green 500
+  --color-warning:    hsl(38, 92%, 50%);     // Amber 400
+  --color-danger:     hsl(0, 84%, 60%);      // Red 500
+  --color-info:       hsl(199, 89%, 48%);    // Cyan 500
+}
+
+// ── Dark theme (default) ─────────────────────────────────────────────────────
+
+.dark-theme {
+  // Backgrounds
+  --bg-base:           hsl(222, 47%, 8%);       // #0d1117
+  --bg-elevated:       hsl(222, 39%, 11%);      // #161b22
+  --bg-overlay:        hsl(222, 34%, 14%);      // #1c2128
+  --surface-subtle:    hsl(222, 30%, 17%);      // #21262d
+  --surface-elevated:  hsl(222, 30%, 19%);      // #252c36
+
+  // Text
+  --text-primary:      hsl(210, 100%, 96%);     // #e6edf3
+  --text-secondary:    hsl(210, 18%, 68%);      // #9198a1
+  --text-tertiary:     hsl(210, 14%, 53%);      // #7d8590
+  --text-disabled:     hsl(210, 10%, 40%);
+
+  // Borders
+  --border-subtle:     hsla(210, 18%, 68%, 0.12);
+  --border-default:    hsla(210, 18%, 68%, 0.2);
+  --border-strong:     hsla(210, 18%, 68%, 0.4);
+
+  // Shadows
+  --shadow-sm:  0 1px 2px hsla(0, 0%, 0%, 0.4);
+  --shadow-md:  0 4px 8px hsla(0, 0%, 0%, 0.4), 0 1px 3px hsla(0, 0%, 0%, 0.3);
+  --shadow-lg:  0 8px 24px hsla(0, 0%, 0%, 0.45), 0 2px 6px hsla(0, 0%, 0%, 0.3);
+  --shadow-xl:  0 16px 48px hsla(0, 0%, 0%, 0.5);
+
+  // Interactive
+  --hover-overlay:   hsla(210, 18%, 68%, 0.08);
+  --active-overlay:  hsla(210, 18%, 68%, 0.16);
+  --focus-ring:      0 0 0 3px hsla(239, 84%, 67%, 0.4);
+
+  // Sidebar
+  --sidebar-width:      260px;
+  --sidebar-collapsed:  68px;
+  --sidebar-bg:         var(--bg-elevated);
+  --sidebar-border:     var(--border-subtle);
+
+  // Header
+  --header-height:     60px;
+  --header-bg:         var(--bg-elevated);
+  --header-border:     var(--border-subtle);
+
+  color-scheme: dark;
+}
+
+// ── Light theme ──────────────────────────────────────────────────────────────
+
+.light-theme {
+  --bg-base:           hsl(0, 0%, 100%);
+  --bg-elevated:       hsl(210, 17%, 98%);
+  --bg-overlay:        hsl(210, 14%, 96%);
+  --surface-subtle:    hsl(210, 14%, 93%);
+  --surface-elevated:  hsl(0, 0%, 100%);
+
+  --text-primary:      hsl(215, 25%, 12%);
+  --text-secondary:    hsl(215, 14%, 34%);
+  --text-tertiary:     hsl(215, 10%, 50%);
+  --text-disabled:     hsl(215, 8%, 70%);
+
+  --border-subtle:     hsla(215, 14%, 34%, 0.1);
+  --border-default:    hsla(215, 14%, 34%, 0.2);
+  --border-strong:     hsla(215, 14%, 34%, 0.35);
+
+  --shadow-sm:  0 1px 2px hsla(0, 0%, 0%, 0.06);
+  --shadow-md:  0 4px 8px hsla(0, 0%, 0%, 0.08), 0 1px 3px hsla(0, 0%, 0%, 0.05);
+  --shadow-lg:  0 8px 24px hsla(0, 0%, 0%, 0.1), 0 2px 6px hsla(0, 0%, 0%, 0.06);
+  --shadow-xl:  0 16px 48px hsla(0, 0%, 0%, 0.14);
+
+  --hover-overlay:   hsla(215, 14%, 34%, 0.06);
+  --active-overlay:  hsla(215, 14%, 34%, 0.12);
+  --focus-ring:      0 0 0 3px hsla(239, 84%, 67%, 0.3);
+
+  color-scheme: light;
+}

@@ -1,0 +1,10 @@
+// =============================================================================
+// Global SCSS — Design System Entry Point
+// Import order matters: variables → reset → base → utilities
+// =============================================================================
+
+@use 'variables' as *;
+@use 'typography';
+@use 'reset';
+@use 'theme';
+@use 'utilities';

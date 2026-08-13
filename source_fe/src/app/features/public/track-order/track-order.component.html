@@ -1,0 +1,38 @@
+<div class="track-order-page">
+      <div class="track-card">
+        <h2 class="text-center mb-6">Tra cứu trạng thái đơn hàng</h2>
+        <p class="text-center text-muted mb-8">Nhập mã đơn hàng hoặc số điện thoại của bạn để kiểm tra trạng thái giao hàng realtime.</p>
+        
+        <div class="search-box">
+          <input type="text" class="form-input form-input--lg" placeholder="Ví dụ: ORD-2026-XYZ..." />
+          <button class="btn btn--primary btn--lg" (click)="search()">Tra cứu ngay</button>
+        </div>
+
+        @if (isSearching()) {
+          <div class="result-box mt-10">
+            <div class="timeline">
+              <div class="timeline-item completed">
+                <div class="timeline-dot">✓</div>
+                <div class="timeline-content">
+                  <h4>Đã xác nhận đơn hàng</h4>
+                  <p class="text-sm text-muted">10:30 AM, 13/08/2026</p>
+                </div>
+              </div>
+              <div class="timeline-item active">
+                <div class="timeline-dot">📦</div>
+                <div class="timeline-content">
+                  <h4>Đang giao hàng</h4>
+                  <p class="text-sm text-muted">Shipper đang trên đường giao (Dự kiến 15 phút nữa)</p>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                  <h4>Giao thành công</h4>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>

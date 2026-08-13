@@ -1,0 +1,81 @@
+<div style="max-width: 700px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-5)">
+  <div class="page-header">
+    <div>
+      <a routerLink="/products" class="text-sm text-muted" style="display:block; margin-bottom: var(--space-1)">← Danh sách sản phẩm</a>
+      <h1 class="page-header__title">{{ isEdit() ? 'Sửa sản phẩm' : 'Thêm sản phẩm' }}</h1>
+    </div>
+  </div>
+
+  <div class="card">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="login__form" novalidate>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4)">
+        <!-- Name -->
+        <div class="form-group" style="grid-column: 1/-1" [class.form-group--error]="touched('name')">
+          <label for="product-name" class="form-label">Tên sản phẩm *</label>
+          <input id="product-name" type="text" formControlName="name" class="form-input" placeholder="Nhập tên sản phẩm" />
+          @if (touched('name')) { <p class="form-error">{{ getError('name') }}</p> }
+        </div>
+
+        <!-- SKU -->
+        <div class="form-group" [class.form-group--error]="touched('sku')">
+          <label for="product-sku" class="form-label">SKU *</label>
+          <input id="product-sku" type="text" formControlName="sku" class="form-input" placeholder="SKU-001" />
+          @if (touched('sku')) { <p class="form-error">{{ getError('sku') }}</p> }
+        </div>
+
+        <!-- Barcode -->
+        <div class="form-group">
+          <label for="product-barcode" class="form-label">Barcode</label>
+          <input id="product-barcode" type="text" formControlName="barcode" class="form-input" placeholder="Barcode" />
+        </div>
+
+        <!-- Price -->
+        <div class="form-group" [class.form-group--error]="touched('price')">
+          <label for="product-price" class="form-label">Giá bán (₫) *</label>
+          <input id="product-price" type="number" formControlName="price" class="form-input" min="0" />
+          @if (touched('price')) { <p class="form-error">{{ getError('price') }}</p> }
+        </div>
+
+        <!-- Cost price -->
+        <div class="form-group">
+          <label for="product-cost" class="form-label">Giá vốn (₫)</label>
+          <input id="product-cost" type="number" formControlName="costPrice" class="form-input" min="0" />
+        </div>
+
+        <!-- Unit -->
+        <div class="form-group">
+          <label for="product-unit" class="form-label">Đơn vị tính</label>
+          <select id="product-unit" formControlName="unit" class="form-input">
+            <option value="cái">Cái</option>
+            <option value="chiếc">Chiếc</option>
+            <option value="kg">Kg</option>
+            <option value="lít">Lít</option>
+            <option value="thùng">Thùng</option>
+            <option value="hộp">Hộp</option>
+          </select>
+        </div>
+
+        <!-- Low stock threshold -->
+        <div class="form-group">
+          <label for="product-threshold" class="form-label">Cảnh báo tồn kho</label>
+          <input id="product-threshold" type="number" formControlName="lowStockThreshold" class="form-input" min="0" />
+        </div>
+
+        <!-- Description -->
+        <div class="form-group" style="grid-column: 1/-1">
+          <label for="product-desc" class="form-label">Mô tả</label>
+          <textarea id="product-desc" formControlName="description" class="form-input" rows="3" placeholder="Mô tả sản phẩm..."></textarea>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="d-flex gap-3 justify-end" style="margin-top: var(--space-4)">
+        <a routerLink="/products" class="btn btn--outline">Hủy</a>
+        <button type="submit" class="btn btn--primary" [disabled]="form.invalid || submitting()" id="save-product-btn">
+          @if (submitting()) { <span class="btn__spinner"></span> }
+          {{ isEdit() ? 'Lưu thay đổi' : 'Tạo sản phẩm' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

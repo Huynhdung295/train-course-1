@@ -1,0 +1,39 @@
+// =============================================================================
+// Typography — Consistent text styles across the app
+// =============================================================================
+
+// ── Headings ─────────────────────────────────────────────────────────────────
+
+h1, .h1 { font-size: var(--text-3xl); font-weight: var(--font-bold); line-height: var(--leading-tight); }
+h2, .h2 { font-size: var(--text-2xl); font-weight: var(--font-semibold); line-height: var(--leading-tight); }
+h3, .h3 { font-size: var(--text-xl); font-weight: var(--font-semibold); line-height: var(--leading-tight); }
+h4, .h4 { font-size: var(--text-lg); font-weight: var(--font-medium); line-height: var(--leading-tight); }
+h5, .h5 { font-size: var(--text-base); font-weight: var(--font-medium); }
+h6, .h6 { font-size: var(--text-sm); font-weight: var(--font-medium); }
+
+// ── Body text ─────────────────────────────────────────────────────────────────
+
+.text-xs   { font-size: var(--text-xs); }
+.text-sm   { font-size: var(--text-sm); }
+.text-base { font-size: var(--text-base); }
+.text-lg   { font-size: var(--text-lg); }
+.text-xl   { font-size: var(--text-xl); }
+
+.text-muted    { color: var(--text-secondary); }
+.text-tertiary { color: var(--text-tertiary); }
+.text-primary  { color: var(--text-primary); }
+.text-danger   { color: var(--color-danger); }
+.text-success  { color: var(--color-success); }
+.text-warning  { color: var(--color-warning); }
+.text-info     { color: var(--color-info); }
+
+.font-mono     { font-family: var(--font-mono); }
+.font-medium   { font-weight: var(--font-medium); }
+.font-semibold { font-weight: var(--font-semibold); }
+.font-bold     { font-weight: var(--font-bold); }
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

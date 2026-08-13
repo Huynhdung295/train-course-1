@@ -1,0 +1,137 @@
+<div class="product-list">
+      <!-- Header -->
+      <div class="page-header">
+        <div>
+          <h1 class="page-header__title">Sản phẩm</h1>
+          <p class="page-header__subtitle">
+            {{ page()?.totalElements ?? 0 }} sản phẩm
+          </p>
+        </div>
+        <div class="page-header__actions">
+          <a *hasPermission="'PRODUCT:CREATE'" routerLink="/products/new" class="btn btn--primary" id="add-product-btn">
+            + Thêm sản phẩm
+          </a>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="filters card">
+        <input
+          type="search"
+          class="form-input"
+          placeholder="🔍 Tìm sản phẩm, SKU, barcode..."
+          [formControl]="searchControl"
+          id="product-search"
+        />
+        <select class="form-input" [formControl]="statusControl" id="product-status-filter">
+          <option value="">Tất cả trạng thái</option>
+          <option value="ACTIVE">Đang bán</option>
+          <option value="INACTIVE">Ngừng bán</option>
+        </select>
+        <label class="checkbox-label">
+          <input type="checkbox" [formControl]="lowStockControl" />
+          <span>Tồn kho thấp</span>
+        </label>
+      </div>
+
+      <!-- Table -->
+      <div class="card" style="padding: 0; overflow: hidden">
+        @if (loading()) {
+          <div class="table-skeleton">
+            @for (i of [1,2,3,4,5]; track i) {
+              <div class="skeleton" style="height: 52px; margin: 0; border-radius: 0;"></div>
+            }
+          </div>
+        } @else if (products().length === 0) {
+          <div class="empty-state">
+            <span class="empty-state__icon">📦</span>
+            <p>Không tìm thấy sản phẩm nào</p>
+            <a *hasPermission="'PRODUCT:CREATE'" routerLink="/products/new" class="btn btn--primary btn--sm">
+              + Thêm sản phẩm đầu tiên
+            </a>
+          </div>
+        } @else {
+          <table class="data-table" role="grid" aria-label="Danh sách sản phẩm">
+            <thead>
+              <tr>
+                <th scope="col">Sản phẩm</th>
+                <th scope="col">SKU</th>
+                <th scope="col" class="text-right">Giá bán</th>
+                <th scope="col" class="text-center">Tồn kho</th>
+                <th scope="col" class="text-center">Trạng thái</th>
+                <th scope="col" class="text-center">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (product of products(); track product.id) {
+                <tr [class.row--low-stock]="isLowStock(product)">
+                  <td>
+                    <div class="product-cell">
+                      <div class="product-cell__avatar">
+                        @if (product.images[0]?.url) {
+                          <img [src]="product.images[0].url" [alt]="product.name" />
+                        } @else {
+                          <span>📦</span>
+                        }
+                      </div>
+                      <div>
+                        <a [routerLink]="'/products/' + product.id" class="product-cell__name">
+                          {{ product.name }}
+                        </a>
+                        @if (product.categoryName) {
+                          <p class="product-cell__category text-muted text-xs">{{ product.categoryName }}</p>
+                        }
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <code class="font-mono text-xs">{{ product.sku }}</code>
+                  </td>
+                  <td class="text-right font-semibold">{{ product.price | currencyVnd }}</td>
+                  <td class="text-center">
+                    <span [class.text-danger]="isLowStock(product)" [class.font-semibold]="isLowStock(product)">
+                      {{ product.stockQuantity }}
+                    </span>
+                  </td>
+                  <td class="text-center">
+                    <span class="badge" [class.badge--success]="product.status === 'ACTIVE'" [class.badge--neutral]="product.status !== 'ACTIVE'">
+                      {{ product.status === 'ACTIVE' ? 'Đang bán' : 'Ngừng bán' }}
+                    </span>
+                  </td>
+                  <td class="text-center">
+                    <div class="action-btns">
+                      <a [routerLink]="'/products/' + product.id + '/edit'" class="btn btn--sm btn--outline" *hasPermission="'PRODUCT:UPDATE'">
+                        Sửa
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+
+          <!-- Pagination -->
+          @if (page() && page()!.totalPages > 1) {
+            <div class="pagination">
+              <button
+                class="btn btn--sm btn--outline"
+                [disabled]="currentPage() === 0"
+                (click)="goToPage(currentPage() - 1)"
+              >
+                ← Trước
+              </button>
+              <span class="pagination__info">
+                Trang {{ currentPage() + 1 }} / {{ page()!.totalPages }}
+              </span>
+              <button
+                class="btn btn--sm btn--outline"
+                [disabled]="page()!.last"
+                (click)="goToPage(currentPage() + 1)"
+              >
+                Tiếp →
+              </button>
+            </div>
+          }
+        }
+      </div>
+    </div>

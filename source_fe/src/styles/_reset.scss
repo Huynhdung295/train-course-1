@@ -1,0 +1,105 @@
+// =============================================================================
+// CSS Reset — Opinionated, minimal
+// =============================================================================
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  height: 100%;
+}
+
+body {
+  height: 100%;
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  color: var(--text-primary);
+  background-color: var(--bg-base);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// Remove list styling when semantic lists don't need it
+ul[role='list'],
+ol[role='list'] {
+  list-style: none;
+}
+
+// Improve link defaults
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+// Improve image display
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+// Form elements inherit font
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+// Prevent overflow with long words
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: break-word;
+}
+
+// Smooth focus rings (accessible)
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: var(--radius-sm);
+}
+
+// Scrollbar styling (webkit)
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-default);
+  border-radius: var(--radius-full);
+
+  &:hover {
+    background: var(--border-strong);
+  }
+}
+
+// Selection color
+::selection {
+  background: hsla(239, 84%, 67%, 0.3);
+  color: var(--text-primary);
+}

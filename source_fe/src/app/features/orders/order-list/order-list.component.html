@@ -1,0 +1,88 @@
+<div class="order-list-page">
+      <div class="page-header">
+        <div>
+          <h1 class="page-header__title">Đơn hàng</h1>
+          <p class="page-header__subtitle">{{ page()?.totalElements ?? 0 }} đơn hàng</p>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="filters card">
+        <input type="search" class="form-input" placeholder="🔍 Tìm số đơn hàng, tên khách..." [formControl]="searchControl" id="order-search" />
+        <select class="form-input" [formControl]="statusControl" id="order-status-filter">
+          <option value="">Tất cả trạng thái</option>
+          @for (entry of statusEntries; track entry.value) {
+            <option [value]="entry.value">{{ entry.label }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Table -->
+      <div class="card" style="padding: 0; overflow: hidden">
+        @if (loading()) {
+          <div class="table-skeleton">
+            @for (i of [1,2,3,4,5]; track i) {
+              <div class="skeleton" style="height: 56px; border-radius: 0;"></div>
+            }
+          </div>
+        } @else if (orders().length === 0) {
+          <div class="empty-state" style="padding: var(--space-16)">
+            <span class="empty-state__icon">📋</span>
+            <p>Không có đơn hàng nào</p>
+          </div>
+        } @else {
+          <table class="data-table" aria-label="Danh sách đơn hàng">
+            <thead>
+              <tr>
+                <th>Số đơn</th>
+                <th>Khách hàng</th>
+                <th>Nhân viên</th>
+                <th class="text-right">Tổng tiền</th>
+                <th class="text-center">Trạng thái</th>
+                <th class="text-center">Thanh toán</th>
+                <th>Thời gian</th>
+                <th class="text-center">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (order of orders(); track order.id) {
+                <tr>
+                  <td>
+                    <a [routerLink]="'/orders/' + order.id" class="font-mono text-sm" style="color: var(--color-primary)">
+                      #{{ order.orderNumber }}
+                    </a>
+                  </td>
+                  <td class="text-sm">{{ order.customerName || 'Khách lẻ' }}</td>
+                  <td class="text-sm text-muted">{{ order.staffName }}</td>
+                  <td class="text-right font-semibold">{{ order.total | currencyVnd }}</td>
+                  <td class="text-center">
+                    <span class="badge badge--{{ getStatusColor(order.status) }}">
+                      {{ getStatusLabel(order.status) }}
+                    </span>
+                  </td>
+                  <td class="text-center">
+                    <span class="badge badge--{{ order.paymentStatus === 'PAID' ? 'success' : 'warning' }}">
+                      {{ order.paymentStatus === 'PAID' ? 'Đã thanh toán' : 'Chờ thanh toán' }}
+                    </span>
+                  </td>
+                  <td class="text-sm text-muted">{{ order.createdAt | relativeTime }}</td>
+                  <td class="text-center">
+                    <a [routerLink]="'/orders/' + order.id" class="btn btn--sm btn--outline">
+                      Chi tiết
+                    </a>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+
+          @if (page()?.totalPages && page()!.totalPages > 1) {
+            <div class="pagination">
+              <button class="btn btn--sm btn--outline" [disabled]="currentPage() === 0" (click)="goToPage(currentPage() - 1)">← Trước</button>
+              <span class="pagination__info">Trang {{ currentPage() + 1 }} / {{ page()!.totalPages }}</span>
+              <button class="btn btn--sm btn--outline" [disabled]="page()!.last" (click)="goToPage(currentPage() + 1)">Tiếp →</button>
+            </div>
+          }
+        }
+      </div>
+    </div>

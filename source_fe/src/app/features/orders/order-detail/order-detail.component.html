@@ -1,0 +1,110 @@
+<div style="max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-5)">
+
+      <!-- Header -->
+      <div class="page-header">
+        <div>
+          <a routerLink="/orders" class="text-sm text-muted" style="display: block; margin-bottom: var(--space-1)">← Danh sách đơn hàng</a>
+          <h1 class="page-header__title">
+            Đơn hàng #{{ order()?.orderNumber }}
+          </h1>
+        </div>
+        @if (order(); as orderData) {
+          <div class="page-header__actions">
+            <span class="badge badge--{{ getStatusColor(orderData.status) }} badge--lg">{{ getStatusLabel(orderData.status) }}</span>
+          </div>
+        }
+      </div>
+
+      @if (loading()) {
+        <div class="card">
+          <div class="skeleton" style="height: 200px;"></div>
+        </div>
+      } @else if (order(); as orderData) {
+        <!-- Order info -->
+        <div class="card">
+          <h2 class="h4" style="margin-bottom: var(--space-4)">Thông tin đơn hàng</h2>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--space-4)">
+            <div>
+              <p class="text-xs text-muted font-semibold">Khách hàng</p>
+              <p class="text-sm">{{ orderData.customerName || 'Khách lẻ' }}</p>
+              @if (orderData.customerPhone) {
+                <p class="text-xs text-muted">{{ orderData.customerPhone }}</p>
+              }
+            </div>
+            <div>
+              <p class="text-xs text-muted font-semibold">Nhân viên</p>
+              <p class="text-sm">{{ orderData.staffName }}</p>
+            </div>
+            <div>
+              <p class="text-xs text-muted font-semibold">Thanh toán</p>
+              <p class="text-sm">{{ orderData.paymentMethod }}</p>
+            </div>
+            <div>
+              <p class="text-xs text-muted font-semibold">Thời gian tạo</p>
+              <p class="text-sm">{{ orderData.createdAt | relativeTime:false }}</p>
+            </div>
+            @if (orderData.note) {
+              <div style="grid-column: 1/-1">
+                <p class="text-xs text-muted font-semibold">Ghi chú</p>
+                <p class="text-sm">{{ orderData.note }}</p>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Order items -->
+        <div class="card" style="padding: 0; overflow: hidden">
+          <h2 class="h4" style="padding: var(--space-4) var(--space-5); border-bottom: 1px solid var(--border-subtle)">Sản phẩm</h2>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Sản phẩm</th>
+                <th class="text-center">Số lượng</th>
+                <th class="text-right">Đơn giá</th>
+                <th class="text-right">Thành tiền</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of orderData.items; track item.id) {
+                <tr>
+                  <td>
+                    <p class="text-sm font-medium">{{ item.productName }}</p>
+                    <p class="text-xs text-muted font-mono">{{ item.sku }}</p>
+                  </td>
+                  <td class="text-center">{{ item.quantity }}</td>
+                  <td class="text-right">{{ item.unitPrice | currencyVnd }}</td>
+                  <td class="text-right font-semibold">{{ item.totalPrice | currencyVnd }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+
+          <!-- Summary -->
+          <div style="padding: var(--space-4) var(--space-5); border-top: 1px solid var(--border-subtle); display: flex; flex-direction: column; align-items: flex-end; gap: var(--space-2)">
+            <div class="d-flex gap-8">
+              <span class="text-sm text-muted">Tạm tính</span>
+              <span class="text-sm">{{ orderData.subtotal | currencyVnd }}</span>
+            </div>
+            @if (+orderData.discountAmount > 0) {
+              <div class="d-flex gap-8 text-success">
+                <span class="text-sm">Giảm giá</span>
+                <span class="text-sm">-{{ orderData.discountAmount | currencyVnd }}</span>
+              </div>
+            }
+            <div class="d-flex gap-8" style="font-size: var(--text-lg); font-weight: var(--font-bold)">
+              <span>Tổng cộng</span>
+              <span>{{ orderData.total | currencyVnd }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="d-flex gap-3 justify-end">
+          @if (canCancel()) {
+            <button class="btn btn--danger" (click)="cancelOrder()" *hasPermission="'ORDER:UPDATE'" id="cancel-order-btn">
+              Hủy đơn hàng
+            </button>
+          }
+        </div>
+      }
+    </div>
