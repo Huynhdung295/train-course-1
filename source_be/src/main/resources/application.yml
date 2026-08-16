@@ -53,8 +53,6 @@ spring:
         order_updates: true
         default_batch_fetch_size: 25
         generate_statistics: true # Detect N+1 issues
-        jdbc:
-          batch_size: 50 # Batch inserts/updates
 
   flyway:
     enabled: true
@@ -109,10 +107,14 @@ app:
     allowed-origins:
       - "http://localhost:3000"
       - "http://localhost:3001"
-  jwt:
-    secret: ${JWT_SECRET:changeme-insecure-local-dev-secret-min32chars}
-    access-token-expiry: ${JWT_ACCESS_EXPIRY:3600}
-    refresh-token-expiry: ${JWT_REFRESH_EXPIRY:86400}
+  security:
+    jwt:
+      access-token-secret: ${JWT_ACCESS_SECRET:changeme-insecure-local-dev-secret-min32chars}
+      refresh-token-secret: ${JWT_REFRESH_SECRET:changeme-insecure-local-dev-refresh-min32chars}
+      access-token-expiry: ${JWT_ACCESS_EXPIRY:1h}
+      refresh-token-expiry: ${JWT_REFRESH_EXPIRY:24h}
+      issuer: "nexus-core"
+      audience: "nexus-clients"
 
 # ─── SpringDoc / Swagger ───────────────────────────────────────────────────
 springdoc:

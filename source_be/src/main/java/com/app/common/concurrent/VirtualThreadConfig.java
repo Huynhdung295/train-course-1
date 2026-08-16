@@ -40,13 +40,10 @@ public class VirtualThreadConfig {
      * Prevents scheduled tasks from starving each other if one runs long.
      */
     @Bean
-    public ThreadPoolTaskScheduler taskScheduler() {
-        var scheduler = new ThreadPoolTaskScheduler();
+    public org.springframework.scheduling.concurrent.SimpleAsyncTaskScheduler taskScheduler() {
+        var scheduler = new org.springframework.scheduling.concurrent.SimpleAsyncTaskScheduler();
         scheduler.setVirtualThreads(true);
         scheduler.setThreadNamePrefix("nexus-scheduler-");
-        scheduler.setPoolSize(5);
-        scheduler.setWaitForTasksToCompleteOnShutdown(true);
-        scheduler.setAwaitTerminationSeconds(60);
         return scheduler;
     }
 }

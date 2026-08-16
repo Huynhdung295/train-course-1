@@ -16,3 +16,28 @@ desktop.ini
 # ─── IDE ──────────────────────────────────────────────────────────────────────
 .idea/
 *.iml
+.vscode/
+
+# ─── Backend (Java, Maven, Spring Boot) ───────────────────────────────────────
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.log
+.mvn/
+!/.mvn/wrapper/maven-wrapper.jar
+
+# ─── Frontend (Node, Angular) ─────────────────────────────────────────────────
+node_modules/
+dist/
+tmp/
+out-tsc/
+bazel-out/
+.angular/
+coverage/
+
+# ─── Environment files ────────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example

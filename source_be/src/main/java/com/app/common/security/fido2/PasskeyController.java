@@ -49,6 +49,6 @@ public class PasskeyController {
     @PostMapping("/login/finish")
     public ResponseEntity<ApiResponse<String>> finishLogin(@RequestBody String credentialJson) {
         var username = webAuthnService.finishAuthentication(credentialJson);
-        return ResponseEntity.ok(new ApiResponse<>("success", "Logged in user: " + username, null));
+        return ResponseEntity.ok(ApiResponse.success("Logged in user: " + username, null));
     }
 }

@@ -55,4 +55,38 @@ public class AsyncConfig {
         executor.initialize();
         return executor;
     }
+
+    /**
+     * General-purpose async pool for lightweight background tasks
+     * (e.g., sending notifications, audit log writes).
+     */
+    @Bean(name = "generalAsyncExecutor")
+    public Executor generalAsyncExecutor() {
+        var executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(5);
+        executor.setMaxPoolSize(20);
+        executor.setQueueCapacity(200);
+        executor.setThreadNamePrefix("nexus-async-");
+        executor.setWaitForTasksToCompleteOnShutdown(true);
+        executor.setAwaitTerminationSeconds(30);
+        executor.initialize();
+        return executor;
+    }
+
+    /**
+     * Dedicated pool for CPU-intensive batch processing tasks
+     * (e.g., report generation, data exports, bulk imports).
+     */
+    @Bean(name = "batchAsyncExecutor")
+    public Executor batchAsyncExecutor() {
+        var executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(2);
+        executor.setMaxPoolSize(5);
+        executor.setQueueCapacity(50);
+        executor.setThreadNamePrefix("nexus-batch-");
+        executor.setWaitForTasksToCompleteOnShutdown(true);
+        executor.setAwaitTerminationSeconds(120); // Batch tasks can take longer
+        executor.initialize();
+        return executor;
+    }
 }

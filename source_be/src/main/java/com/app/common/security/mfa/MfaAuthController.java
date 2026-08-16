@@ -44,7 +44,7 @@ public class MfaAuthController {
             ));
         }
 
-        return ResponseEntity.ok(new ApiResponse<>("success", "Token", null));
+        return ResponseEntity.ok(ApiResponse.success("Token", null));
     }
 
     @PostMapping("/mfa/totp/verify")
@@ -63,7 +63,7 @@ public class MfaAuthController {
         }
 
         redisTemplate.delete("mfa:challenge:" + request.challengeId());
-        return ResponseEntity.ok(new ApiResponse<>("success", "MFA Login successful", null));
+        return ResponseEntity.ok(ApiResponse.success("MFA Login successful", null));
     }
 }
 

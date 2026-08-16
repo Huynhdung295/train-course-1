@@ -61,7 +61,7 @@ public class KafkaConsumerConfig {
         factory.setConsumerFactory(consumerFactory());
         factory.setConcurrency(3);
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL_IMMEDIATE);
-        factory.setObservationEnabled(true);
+        factory.getContainerProperties().setObservationEnabled(true);
 
         // Retry 3 times with 1s interval, then send to DLT
         var errorHandler = new DefaultErrorHandler(new FixedBackOff(1_000L, 3L));

@@ -1,7 +1,7 @@
 package com.app.common.security.jwt;
 
 import com.app.common.security.SecurityUser;
-import com.app.users.service.SecurityUserDetailsService;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -30,7 +30,7 @@ public class AuthController {
 
     private final AuthenticationManager authenticationManager;
     private final JwtTokenService tokenService;
-    private final SecurityUserDetailsService userDetailsService;
+    private final UserDetailsService userDetailsService;
 
     @PostMapping("/login")
     public ResponseEntity<TokenResponse> login(@Valid @RequestBody LoginRequest request,

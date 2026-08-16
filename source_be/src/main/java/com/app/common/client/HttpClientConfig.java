@@ -8,7 +8,11 @@ import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import reactor.core.publisher.Mono;
+import reactor.netty.http.client.HttpClient;
+
+import java.time.Duration;
 
 
 /**
@@ -50,9 +54,16 @@ public class HttpClientConfig {
 
     @Bean
     public WebClient.Builder webClientBuilder() {
+        HttpClient httpClient = HttpClient.create()
+            .option(io.netty.channel.ChannelOption.CONNECT_TIMEOUT_MILLIS, 5_000)
+            .responseTimeout(Duration.ofSeconds(30))
+            .compress(true);
+
         return WebClient.builder()
+            .clientConnector(new ReactorClientHttpConnector(httpClient))
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+            .codecs(codecs -> codecs.defaultCodecs().maxInMemorySize(50 * 1024 * 1024))
             .filter(requestLogFilter())
             .filter(responseLogFilter());
     }
