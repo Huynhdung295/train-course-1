@@ -3,9 +3,10 @@ package com.app.common.tenant;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.stereotype.Component;
 
 @SuppressWarnings("all")
-
+@Component
 public class TenantInterceptor implements HandlerInterceptor {
 
     @Override

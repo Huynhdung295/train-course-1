@@ -52,9 +52,6 @@ public class OrderJpaEntity extends SoftDeletableEntity {
     @Embedded
     private ShippingAddressEmbeddable shippingAddress;
 
-    @Version
-    @Column(name = "version", nullable = false)
-    private Integer version;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @BatchSize(size = 25)

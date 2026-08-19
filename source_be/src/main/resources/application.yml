@@ -7,16 +7,9 @@ spring:
     featureToggle:
       newCheckoutFlow: true
       experimentalUi: false
-  webauthn:
-    rp-id: "company.com"
-    rp-name: "Company App"
-    origins:
-      - "https://app.company.com"
-      - "https://company.com"
-      - "http://localhost:3000"
-    challenge-ttl: PT5M
+
   profiles:
-    active: ${SPRING_PROFILES_ACTIVE:local}  # Override with env var in prod: SPRING_PROFILES_ACTIVE=prod
+    active: ${SPRING_PROFILES_ACTIVE:dev}  # Override with env var in prod: SPRING_PROFILES_ACTIVE=prod
   cloud:
     gateway:
       routes:
@@ -29,9 +22,9 @@ spring:
       enabled: true
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/ecommerce
-    username: myuser
-    password: mypassword
+    url: jdbc:postgresql://localhost:5432/nexus_erp
+    username: nexus_admin
+    password: nexus_secret
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10
@@ -103,10 +96,15 @@ logging:
 # ─── CORS: Profile-specific allowed origins ────────────────────────────────
 # Override in application-dev.yml / application-prod.yml
 app:
-  cors:
-    allowed-origins:
+  webauthn:
+    rp-id: "localhost"
+    rp-name: "Nexus ERP Local"
+    origins:
       - "http://localhost:3000"
-      - "http://localhost:3001"
+      - "http://localhost:8080"
+    challenge-ttl: PT5M
+  cors:
+    allowed-origins: "http://localhost:3000,http://localhost:3001"
   security:
     jwt:
       access-token-secret: ${JWT_ACCESS_SECRET:changeme-insecure-local-dev-secret-min32chars}

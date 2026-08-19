@@ -77,4 +77,19 @@ public class CacheConfig {
             .withInitialCacheConfigurations(cacheConfigs)
             .build();
     }
+
+    @Bean
+    public org.springframework.data.redis.core.RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
+        org.springframework.data.redis.core.RedisTemplate<String, Object> template = new org.springframework.data.redis.core.RedisTemplate<>();
+        template.setConnectionFactory(connectionFactory);
+        
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+        
+        template.setHashKeySerializer(new StringRedisSerializer());
+        template.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
+        
+        template.afterPropertiesSet();
+        return template;
+    }
 }

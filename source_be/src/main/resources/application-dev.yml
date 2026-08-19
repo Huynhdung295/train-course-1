@@ -4,9 +4,9 @@
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/ecommerce_dev
-    username: dev_user
-    password: dev_password
+    url: jdbc:postgresql://localhost:5432/nexus_erp
+    username: nexus_admin
+    password: nexus_secret
 
   # Use H2 for fast local testing (optional, switch to PostgreSQL if needed)
   jpa:
@@ -23,7 +23,7 @@ spring:
 
   # Local Kafka
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: localhost:9093
 
   # Local RabbitMQ
   rabbitmq:
@@ -31,6 +31,19 @@ spring:
     port: 5672
     username: guest
     password: guest
+
+  # Local Mail/SMTP (e.g. MailHog)
+  mail:
+    host: localhost
+    port: 1025
+    username: ""
+    password: ""
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
 
 logging:
   level:

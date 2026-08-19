@@ -59,4 +59,32 @@ public class KafkaProducerConfig {
         template.setObservationEnabled(true); // Enable Micrometer tracing for Kafka
         return template;
     }
+
+    @Bean
+    public ProducerFactory<String, String> stringProducerFactory() {
+        Map<String, Object> props = new HashMap<>();
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+
+        // Reliability settings
+        props.put(ProducerConfig.ACKS_CONFIG, "all");
+        props.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true);
+        props.put(ProducerConfig.RETRIES_CONFIG, 3);
+        props.put(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, 5);
+
+        // Performance settings
+        props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, "lz4");
+        props.put(ProducerConfig.BATCH_SIZE_CONFIG, 16384);
+        props.put(ProducerConfig.LINGER_MS_CONFIG, 5);
+
+        return new DefaultKafkaProducerFactory<>(props);
+    }
+
+    @Bean
+    public KafkaTemplate<String, String> stringKafkaTemplate() {
+        KafkaTemplate<String, String> template = new KafkaTemplate<>(stringProducerFactory());
+        template.setObservationEnabled(true);
+        return template;
+    }
 }

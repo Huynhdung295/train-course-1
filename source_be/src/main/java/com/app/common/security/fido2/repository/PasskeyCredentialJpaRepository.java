@@ -11,8 +11,8 @@ import java.util.Optional;
 
 public interface PasskeyCredentialJpaRepository extends JpaRepository<PasskeyCredential, String> {
 
-    @Query("SELECT p FROM PasskeyCredential p JOIN User u ON p.userId = u.id WHERE u.username = :username")
-    List<PasskeyCredential> findByUserEmail(@Param("username") String username);
+    @Query("SELECT p FROM PasskeyCredential p JOIN User u ON p.userId = u.id WHERE u.email = :email")
+    List<PasskeyCredential> findByUserEmail(@Param("email") String email);
 
     Optional<PasskeyCredential> findByCredentialId(String credentialId);
 
