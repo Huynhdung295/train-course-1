@@ -1,0 +1,19 @@
+{
+  "name": "@nexus/mfe-marketing",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev --port 3006",
+    "build": "astro build",
+    "preview": "astro preview --port 3006",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "astro": "^5.0.0",
+    "@astrojs/sitemap": "^3.2.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0"
+  }
+}

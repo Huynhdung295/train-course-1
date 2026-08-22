@@ -1,0 +1,37 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+interface Post {
+  slug: string;
+  title: string;
+  date: string;
+  excerpt: string;
+  readTime: number;
+}
+
+// Static blog posts – in production, fetch from CMS/headless
+const posts: Post[] = [
+  { slug: 'micro-frontend-2026', title: 'Micro Frontend Architecture 2026: Best Practices', date: '2026-08-01', excerpt: 'Khám phá cách xây dựng hệ thống Micro Frontend với Next.js 16, Nuxt 4, Angular 22 và Module Federation...', readTime: 8 },
+  { slug: 'sse-vs-websocket', title: 'SSE vs WebSocket: Khi nào dùng cái nào?', date: '2026-07-15', excerpt: 'Phân tích chi tiết ưu nhược điểm của SSE và WebSocket trong các use case thực tế...', readTime: 6 },
+  { slug: 'saga-pattern', title: 'Saga Pattern trong phân tán hệ thống', date: '2026-07-01', excerpt: 'Tìm hiểu cách Saga Pattern giải quyết vấn đề distributed transaction trong microservices...', readTime: 10 },
+];
+---
+<BaseLayout title="Blog" description="Chia sẻ kiến thức về kiến trúc phần mềm, Micro Frontend, và công nghệ hiện đại.">
+  <div style="min-height: 100vh; padding: 5rem 2rem;">
+    <div style="max-width: 800px; margin: 0 auto;">
+      <h1 style="font-size: 2.5rem; font-weight: 900; color: #f8fafc; margin-bottom: 0.5rem;">Blog</h1>
+      <p style="color: #64748b; margin-bottom: 3rem;">Kiến thức & kinh nghiệm từ đội ngũ kỹ thuật</p>
+
+      <div style="display: flex; flex-direction: column; gap: 2rem;">
+        {posts.map(({ slug, title, date, excerpt, readTime }) => (
+          <a href={`/blog/${slug}`} style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 1rem; padding: 1.75rem; text-decoration: none; display: block; transition: border-color 0.2s;" onmouseover="this.style.borderColor='rgba(59,130,246,0.5)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)'">
+            <div style="font-size: 0.75rem; color: #64748b; margin-bottom: 0.5rem;">{new Date(date).toLocaleDateString('vi-VN')} · {readTime} phút đọc</div>
+            <h2 style="font-size: 1.25rem; font-weight: 700; color: #f8fafc; margin-bottom: 0.75rem; line-height: 1.4;">{title}</h2>
+            <p style="color: #64748b; font-size: 0.875rem; line-height: 1.7;">{excerpt}</p>
+            <span style="display: inline-block; margin-top: 1rem; color: #3b82f6; font-size: 0.875rem; font-weight: 600;">Đọc tiếp →</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </div>
+</BaseLayout>

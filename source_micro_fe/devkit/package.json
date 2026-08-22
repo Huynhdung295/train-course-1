@@ -1,0 +1,18 @@
+{
+  "name": "nexus-devkit",
+  "version": "1.0.0",
+  "description": "Nexus MFE Developer Dashboard",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.0",
+    "ws": "^8.17.0",
+    "open": "^10.1.0",
+    "pidtree": "^0.6.0",
+    "ps-list": "^8.1.1"
+  }
+}

@@ -1,0 +1,64 @@
+name: CI – Lint, Type-check, Test, Build
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+env:
+  PNPM_VERSION: 9
+
+jobs:
+  ci:
+    name: CI Pipeline
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Get pnpm store path
+        id: pnpm-cache
+        run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: ${{ runner.os }}-pnpm-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm turbo run lint
+
+      - name: Type-check
+        run: pnpm turbo run type-check
+
+      - name: Unit Tests
+        run: pnpm turbo run test -- --coverage
+
+      - name: Build all packages & apps
+        run: pnpm turbo run build
+        env:
+          NEXT_PUBLIC_API_BASE_URL: http://localhost:8080
+          NEXT_PUBLIC_MFE_AUTH_URL: http://localhost:3001
+          NEXT_PUBLIC_MFE_POS_URL: http://localhost:3002
+          NEXT_PUBLIC_MFE_ERP_URL: http://localhost:3003
+          NEXT_PUBLIC_MFE_CATALOG_URL: http://localhost:3004
+          NEXT_PUBLIC_MFE_USERS_URL: http://localhost:3005

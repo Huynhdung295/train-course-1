@@ -1,0 +1,935 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Nexus DevKit Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#0b0f1a;--surface:#111827;--surface2:#1a2035;--surface3:#1f2842;
+  --border:#1e2d4a;--border2:#263454;
+  --text:#e2e8f0;--muted:#64748b;--muted2:#4a5568;
+  --blue:#3b82f6;--blue-dark:#2563eb;--blue-glow:rgba(59,130,246,.35);
+  --green:#10b981;--amber:#f59e0b;--red:#ef4444;--purple:#8b5cf6;--cyan:#06b6d4;
+  --pink:#ec4899;--orange:#f97316;
+  --radius:12px;--radius-sm:8px;--radius-lg:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--surface)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+/* HEADER */
+header{display:flex;align-items:center;justify-content:space-between;padding:.875rem 1.5rem;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;gap:1rem}
+.brand{display:flex;align-items:center;gap:.625rem}
+.brand-icon{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;font-size:1rem}
+.brand-name{font-size:.9375rem;font-weight:800;background:linear-gradient(135deg,var(--blue),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.brand-sub{font-size:.6875rem;color:var(--muted);font-weight:500}
+.header-actions{display:flex;align-items:center;gap:.5rem}
+.ws-indicator{display:flex;align-items:center;gap:.375rem;font-size:.6875rem;color:var(--muted);background:var(--surface2);border:1px solid var(--border);padding:.3125rem .75rem;border-radius:9999px}
+.ws-dot{width:6px;height:6px;border-radius:9999px;background:var(--red);transition:background .3s}
+.ws-dot.connected{background:var(--green);animation:pulse-dot 2s infinite}
+@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.5}}
+
+.env-badge-btn{display:flex;align-items:center;gap:.375rem;font-size:.6875rem;font-weight:700;background:rgba(59,130,246,0.15);border:1px solid var(--blue);color:var(--blue);padding:.3125rem .75rem;border-radius:9999px;cursor:pointer;transition:all .2s}
+.env-badge-btn:hover{background:rgba(59,130,246,0.25)}
+
+/* LAYOUT */
+.main{display:flex;flex:1;overflow:hidden}
+.sidebar{width:220px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
+.content{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.panel-area{flex:1;overflow-y:auto;padding:1.25rem;display:flex;flex-direction:column;gap:1.25rem}
+
+/* SIDEBAR */
+.sidebar-section{padding:.75rem .625rem}
+.sidebar-section-title{font-size:.625rem;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em;padding:.25rem .625rem .5rem}
+.nav-btn{width:100%;display:flex;align-items:center;gap:.5rem;padding:.5625rem .75rem;border-radius:var(--radius-sm);border:none;background:transparent;color:var(--muted);font-size:.8125rem;font-weight:500;cursor:pointer;transition:all .15s;text-align:left}
+.nav-btn:hover{background:var(--surface2);color:var(--text)}
+.nav-btn.active{background:var(--surface3);color:var(--text)}
+.nav-btn .nav-icon{font-size:.875rem;width:1.25rem;text-align:center}
+.sidebar-divider{height:1px;background:var(--border);margin:.375rem .625rem}
+
+/* GLOBAL ACTIONS */
+.global-bar{padding:.75rem 1.5rem;border-bottom:1px solid var(--border);background:var(--surface);display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;flex-shrink:0}
+.global-label{font-size:.6875rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-right:.25rem}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:.375rem;padding:.4375rem .875rem;border-radius:var(--radius-sm);border:none;font-size:.8125rem;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap;font-family:inherit}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn-primary{background:var(--blue);color:#fff}
+.btn-primary:hover:not(:disabled){background:var(--blue-dark)}
+.btn-success{background:var(--green);color:#fff}
+.btn-success:hover:not(:disabled){filter:brightness(1.1)}
+.btn-danger{background:var(--red);color:#fff}
+.btn-danger:hover:not(:disabled){filter:brightness(1.1)}
+.btn-warning{background:var(--amber);color:#000}
+.btn-warning:hover:not(:disabled){filter:brightness(1.1)}
+.btn-ghost{background:var(--surface2);color:var(--text);border:1px solid var(--border2)}
+.btn-ghost:hover:not(:disabled){background:var(--surface3)}
+.btn-sm{padding:.3125rem .625rem;font-size:.75rem}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.card-header{display:flex;align-items:center;justify-content:space-between;padding:.875rem 1rem;border-bottom:1px solid var(--border);background:var(--surface2)}
+.card-title{font-size:.8125rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:.5rem}
+.card-body{padding:1rem}
+
+/* APP GRID */
+.apps-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:.875rem}
+.app-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:border-color .2s}
+.app-card:hover{border-color:var(--border2)}
+.app-color-bar{position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:2px 0 0 2px}
+.app-card-header{position:relative;padding:.75rem 1rem .75rem 1.25rem;display:flex;align-items:center;gap:.625rem;border-bottom:1px solid var(--border)}
+.app-icon{font-size:1.25rem}
+.app-info{flex:1;min-width:0}
+.app-name{font-size:.8125rem;font-weight:700;color:var(--text)}
+.app-port{font-size:.6875rem;color:var(--muted);font-family:'JetBrains Mono',monospace}
+.app-card-body{padding:.75rem 1rem;display:flex;flex-direction:column;gap:.625rem}
+.app-card-actions{display:flex;gap:.375rem;flex-wrap:wrap}
+.status-badge{display:inline-flex;align-items:center;gap:.3125rem;font-size:.6875rem;font-weight:600;padding:.25rem .625rem;border-radius:9999px}
+.status-badge.running{background:rgba(16,185,129,.15);color:var(--green)}
+.status-badge.stopped{background:rgba(100,116,139,.15);color:var(--muted)}
+.status-badge.starting{background:rgba(59,130,246,.15);color:var(--blue)}
+.status-badge.stopping{background:rgba(245,158,11,.15);color:var(--amber)}
+.status-badge.error{background:rgba(239,68,68,.15);color:var(--red)}
+.status-dot{width:6px;height:6px;border-radius:9999px;background:currentColor}
+.status-badge.running .status-dot{animation:pulse-dot 1.5s infinite}
+
+/* LOG TERMINAL */
+.log-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);display:flex;flex-direction:column;height:100%;min-height:300px}
+.log-tabs{display:flex;gap:0;overflow-x:auto;border-bottom:1px solid var(--border);background:var(--surface2);flex-shrink:0;padding:0 .625rem;padding-top:.375rem}
+.log-tab{padding:.4375rem .875rem;border-radius:6px 6px 0 0;border:none;background:transparent;color:var(--muted);font-size:.75rem;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap;font-family:inherit;position:relative}
+.log-tab:hover{color:var(--text)}
+.log-tab.active{background:var(--surface);color:var(--text)}
+.log-tab .badge{position:absolute;top:4px;right:4px;width:6px;height:6px;border-radius:9999px;background:var(--blue)}
+.log-body{flex:1;overflow-y:auto;padding:.75rem;font-family:'JetBrains Mono',monospace;font-size:.6875rem;line-height:1.6;color:#a8b3cf}
+.log-line{white-space:pre-wrap;word-break:break-all;padding:.0625rem 0}
+.log-line.error-line{color:var(--red)}
+.log-line.success-line{color:var(--green)}
+.log-line.info-line{color:var(--cyan)}
+.log-actions{display:flex;align-items:center;gap:.5rem;padding:.5rem .75rem;border-top:1px solid var(--border);background:var(--surface2);flex-shrink:0}
+.log-filter{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.3125rem .625rem;color:var(--text);font-size:.75rem;font-family:'JetBrains Mono',monospace;outline:none}
+.log-filter:focus{border-color:var(--blue)}
+
+/* SYSTEM INFO */
+.sys-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.75rem}
+.sys-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.875rem;display:flex;flex-direction:column;gap:.375rem}
+.sys-label{font-size:.6875rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.sys-value{font-size:1.125rem;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums}
+.sys-sub{font-size:.6875rem;color:var(--muted)}
+
+/* ENV MANAGER */
+.env-scope-tabs{display:flex;gap:.375rem;overflow-x:auto;padding-bottom:.75rem;margin-bottom:1rem;border-bottom:1px solid var(--border)}
+.env-scope-btn{padding:.375rem .75rem;border-radius:9999px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);font-size:.75rem;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:.375rem}
+.env-scope-btn:hover{background:var(--surface3);color:var(--text)}
+.env-scope-btn.active{background:var(--blue);border-color:var(--blue);color:#fff}
+
+.env-selector-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:.75rem;margin-bottom:1.25rem}
+.env-card{background:var(--surface2);border:2px solid var(--border);border-radius:var(--radius);padding:1rem;cursor:pointer;transition:all .2s;position:relative}
+.env-card:hover{border-color:var(--border2);transform:translateY(-1px)}
+.env-card.active-tab{border-color:var(--blue);background:rgba(59,130,246,0.08);box-shadow:0 0 16px rgba(59,130,246,0.15)}
+.env-badge-tag{position:absolute;top:.75rem;right:.75rem;font-size:.625rem;font-weight:800;padding:.125rem .5rem;border-radius:9999px}
+.env-badge-tag.active-env{background:var(--green);color:#000}
+
+.env-editor-textarea{width:100%;height:380px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.875rem;font-family:'JetBrains Mono',monospace;font-size:.75rem;line-height:1.6;color:#cbd5e1;outline:none;resize:vertical}
+.env-editor-textarea:focus{border-color:var(--blue)}
+
+/* TASK PANEL */
+.task-output{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.75rem;font-family:'JetBrains Mono',monospace;font-size:.6875rem;line-height:1.7;color:#a8b3cf;max-height:300px;overflow-y:auto}
+.progress-track{height:4px;background:var(--surface3);border-radius:2px;overflow:hidden}
+.progress-bar{height:100%;border-radius:2px;transition:width .5s;background:var(--blue)}
+
+/* PORT STATUS */
+.port-row{display:flex;align-items:center;gap:.75rem;padding:.5rem 0;border-bottom:1px solid var(--border);font-size:.8125rem}
+.port-row:last-child{border-bottom:none}
+.port-num{font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--muted);width:50px}
+.port-name{flex:1;color:var(--text);font-weight:500}
+.port-status{width:70px;text-align:right}
+.chip-open{font-size:.6875rem;font-weight:700;color:var(--green);background:rgba(16,185,129,.12);padding:.1875rem .5rem;border-radius:9999px}
+.chip-closed{font-size:.6875rem;font-weight:700;color:var(--muted);background:rgba(100,116,139,.12);padding:.1875rem .5rem;border-radius:9999px}
+
+/* GIT */
+.git-output{font-family:'JetBrains Mono',monospace;font-size:.6875rem;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.75rem;color:#a8b3cf;white-space:pre-wrap;max-height:200px;overflow-y:auto}
+
+/* TABS */
+.view{display:none}
+.view.active{display:flex;flex-direction:column;gap:1.25rem}
+
+/* TOAST */
+#toast-container{position:fixed;bottom:1.5rem;right:1.5rem;display:flex;flex-direction:column;gap:.5rem;z-index:9999;pointer-events:none}
+.toast{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:.75rem 1rem;font-size:.8125rem;font-weight:500;animation:toast-in .25s ease;max-width:320px}
+.toast.success{border-left:3px solid var(--green)}
+.toast.error{border-left:3px solid var(--red)}
+.toast.info{border-left:3px solid var(--blue)}
+@keyframes toast-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes toast-out{to{opacity:0;transform:translateY(8px)}}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="brand">
+    <div class="brand-icon">⚡</div>
+    <div>
+      <div class="brand-name">Nexus DevKit</div>
+      <div class="brand-sub">Micro Frontend Control Center</div>
+    </div>
+  </div>
+  <div class="header-actions">
+    <button class="env-badge-btn" id="header-env-badge" onclick="showView('env',document.getElementById('nav-env-btn'));loadEnv();">
+      <span id="env-badge-icon">🟢</span> <span id="env-badge-text">LOCAL ENV</span>
+    </button>
+    <div class="ws-indicator">
+      <div class="ws-dot" id="ws-dot"></div>
+      <span id="ws-label">Kết nối...</span>
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="refreshPorts()">🔍 Scan Ports</button>
+    <button class="btn btn-ghost btn-sm" onclick="loadSystem()">💻 System</button>
+  </div>
+</header>
+
+<!-- GLOBAL ACTION BAR -->
+<div class="global-bar">
+  <span class="global-label">ALL:</span>
+  <button class="btn btn-success btn-sm" onclick="allStart()">▶ Start All</button>
+  <button class="btn btn-danger btn-sm" onclick="allStop()">⏹ Stop All</button>
+  
+  <div style="width:1px;height:22px;background:var(--border);margin:0 .25rem"></div>
+  
+  <span class="global-label" style="color:var(--purple)">⚡ RAM SAVER PRESETS:</span>
+  <button class="btn btn-ghost btn-sm" onclick="startPreset('core')">⚡ Host + Auth (1GB)</button>
+  <button class="btn btn-ghost btn-sm" onclick="startPreset('pos')">🛒 POS Workspace (1.5GB)</button>
+  <button class="btn btn-ghost btn-sm" onclick="startPreset('erp')">📊 ERP Suite (3GB)</button>
+  <button class="btn btn-ghost btn-sm" onclick="startPreset('marketing')">🌐 Marketing (400MB)</button>
+
+  <div style="width:1px;height:22px;background:var(--border);margin:0 .25rem"></div>
+  
+  <span class="global-label">TOOLS:</span>
+  <button class="btn btn-ghost btn-sm" onclick="runInstall()">📦 Install</button>
+  <button class="btn btn-ghost btn-sm" onclick="runBuildPkgs()">⚙️ Build Pkgs</button>
+  <button class="btn btn-ghost btn-sm" onclick="runTypecheck()">🔎 Typecheck</button>
+  <button class="btn btn-ghost btn-sm" onclick="runClean()">🧹 Clean</button>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Navigation</div>
+      <button class="nav-btn active" onclick="showView('apps',this)"><span class="nav-icon">🏗️</span> Apps Dashboard</button>
+      <button class="nav-btn" id="nav-env-btn" onclick="showView('env',this);loadEnv()"><span class="nav-icon">🌐</span> Env Manager</button>
+      <button class="nav-btn" onclick="showView('logs',this)"><span class="nav-icon">📜</span> Live Logs</button>
+      <button class="nav-btn" onclick="showView('ports',this);refreshPorts()"><span class="nav-icon">🔌</span> Port Monitor</button>
+      <button class="nav-btn" onclick="showView('tasks',this)"><span class="nav-icon">⚡</span> Tasks / Build</button>
+      <button class="nav-btn" onclick="showView('git',this)"><span class="nav-icon">🔄</span> Git</button>
+      <button class="nav-btn" onclick="showView('system',this);loadSystem()"><span class="nav-icon">💻</span> System Info</button>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Quick Open</div>
+      <button class="nav-btn" onclick="openUrl('http://localhost:3000')"><span class="nav-icon">🏠</span> Shell :3000</button>
+      <button class="nav-btn" onclick="openUrl('http://localhost:3001')"><span class="nav-icon">🔐</span> Auth :3001</button>
+      <button class="nav-btn" onclick="openUrl('http://localhost:3002')"><span class="nav-icon">🏪</span> POS :3002</button>
+      <button class="nav-btn" onclick="openUrl('http://localhost:3003')"><span class="nav-icon">📊</span> ERP :3003</button>
+      <button class="nav-btn" onclick="openUrl('http://localhost:3004')"><span class="nav-icon">📦</span> Catalog :3004</button>
+      <button class="nav-btn" onclick="openUrl('http://localhost:3005')"><span class="nav-icon">👥</span> Users :3005</button>
+      <button class="nav-btn" onclick="openUrl('http://localhost:3006')"><span class="nav-icon">🌐</span> Marketing :3006</button>
+    </div>
+  </nav>
+
+  <!-- CONTENT -->
+  <div class="content">
+    <div class="panel-area">
+
+      <!-- VIEW: APPS -->
+      <div id="view-apps" class="view active">
+        <div class="apps-grid" id="apps-grid"><!-- populated by JS --></div>
+      </div>
+
+      <!-- VIEW: ENV MANAGER -->
+      <div id="view-env" class="view">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🌐 Environment Configuration & Inspector</div>
+            <div style="display:flex;gap:.5rem">
+              <button class="btn btn-ghost btn-sm" onclick="syncEnvToAll()">🔄 Sync Root .env to All 7 Apps</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <!-- SCOPE SWITCHER -->
+            <div class="env-scope-tabs">
+              <button class="env-scope-btn active" id="scope-global" onclick="selectEnvScope('global')">🌐 Global Root (.env)</button>
+              <button class="env-scope-btn" id="scope-shell" onclick="selectEnvScope('shell')">🏠 Shell (:3000)</button>
+              <button class="env-scope-btn" id="scope-mfe-auth" onclick="selectEnvScope('mfe-auth')">🔐 Auth (:3001)</button>
+              <button class="env-scope-btn" id="scope-mfe-pos" onclick="selectEnvScope('mfe-pos')">🏪 POS (:3002)</button>
+              <button class="env-scope-btn" id="scope-mfe-erp" onclick="selectEnvScope('mfe-erp')">📊 ERP (:3003)</button>
+              <button class="env-scope-btn" id="scope-mfe-catalog" onclick="selectEnvScope('mfe-catalog')">📦 Catalog (:3004)</button>
+              <button class="env-scope-btn" id="scope-mfe-users" onclick="selectEnvScope('mfe-users')">👥 Users (:3005)</button>
+              <button class="env-scope-btn" id="scope-mfe-marketing" onclick="selectEnvScope('mfe-marketing')">🌐 Marketing (:3006)</button>
+            </div>
+
+            <!-- GLOBAL ROOT MODE CARDS (Shown when scope is global) -->
+            <div id="global-env-cards-area">
+              <div class="env-selector-grid">
+                <div class="env-card active-tab" id="env-card-local" onclick="selectEnvTab('local')">
+                  <div class="env-title">🟢 Localhost</div>
+                  <div class="env-desc">:8080 & :3000-3006</div>
+                  <div class="env-badge-tag" id="env-tag-local"></div>
+                </div>
+                <div class="env-card" id="env-card-development" onclick="selectEnvTab('development')">
+                  <div class="env-title">🟡 Dev Cloud</div>
+                  <div class="env-desc">dev-api.nexus-erp.vn</div>
+                  <div class="env-badge-tag" id="env-tag-development"></div>
+                </div>
+                <div class="env-card" id="env-card-staging" onclick="selectEnvTab('staging')">
+                  <div class="env-title">🔵 Staging / UAT</div>
+                  <div class="env-desc">staging-api.nexus-erp.vn</div>
+                  <div class="env-badge-tag" id="env-tag-staging"></div>
+                </div>
+                <div class="env-card" id="env-card-production" onclick="selectEnvTab('production')">
+                  <div class="env-title">🔴 Production</div>
+                  <div class="env-desc">api.nexus-erp.vn</div>
+                  <div class="env-badge-tag" id="env-tag-production"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- EDITOR TOOLBAR -->
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.625rem;flex-wrap:wrap;gap:.5rem">
+              <div style="display:flex;align-items:center;gap:.5rem">
+                <span style="font-size:.8125rem;font-weight:700;color:var(--text)" id="env-editor-label">File: .env.local</span>
+                <span id="env-viewing-badge" style="font-size:.6875rem;padding:.125rem .5rem;border-radius:9999px;background:rgba(59,130,246,0.15);color:var(--blue);font-weight:700">EDITING</span>
+              </div>
+              <div style="display:flex;gap:.5rem" id="env-action-buttons">
+                <!-- Buttons populated dynamically by JS based on scope -->
+              </div>
+            </div>
+
+            <textarea class="env-editor-textarea" id="env-editor-textarea" placeholder="Loading env..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW: LOGS -->
+      <div id="view-logs" class="view">
+        <div class="log-panel" style="height:calc(100vh - 200px)">
+          <div class="log-tabs" id="log-tabs"><!-- tabs --></div>
+          <div class="log-body" id="log-body">
+            <div style="color:var(--muted);font-size:.75rem">Chọn một App ở tab phía trên để xem logs realtime...</div>
+          </div>
+          <div class="log-actions">
+            <input class="log-filter" id="log-filter" placeholder="Filter logs..." oninput="filterLogs()" />
+            <button class="btn btn-ghost btn-sm" onclick="clearLogs()">🗑 Clear</button>
+            <button class="btn btn-ghost btn-sm" onclick="toggleAutoScroll()">📌 <span id="autoscroll-label">Auto-scroll ON</span></button>
+            <button class="btn btn-ghost btn-sm" onclick="copyLogs()">📋 Copy</button>
+            <button class="btn btn-ghost btn-sm" onclick="downloadLogs()">💾 Export</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW: PORTS -->
+      <div id="view-ports" class="view">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🔌 Port Status Monitor</div>
+            <button class="btn btn-ghost btn-sm" onclick="refreshPorts()">🔄 Refresh</button>
+          </div>
+          <div class="card-body" id="ports-body">
+            <div style="color:var(--muted);font-size:.8125rem">Scanning ports...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW: TASKS -->
+      <div id="view-tasks" class="view">
+        <div class="card">
+          <div class="card-header"><div class="card-title">⚡ Task Runner</div></div>
+          <div class="card-body" style="display:flex;flex-direction:column;gap:.75rem">
+            <div style="display:flex;flex-wrap:wrap;gap:.5rem">
+              <button class="btn btn-ghost" onclick="runInstall()">📦 pnpm install</button>
+              <button class="btn btn-ghost" onclick="runBuildPkgs()">⚙️ Build All Packages</button>
+              <button class="btn btn-ghost" onclick="runTypecheck()">🔎 Type-Check</button>
+              <button class="btn btn-ghost" onclick="runLint()">✨ ESLint</button>
+              <button class="btn btn-ghost" onclick="runClean()">🧹 Clean Artifacts</button>
+            </div>
+            <div style="font-size:.75rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-top:.25rem">Build Individual App</div>
+            <div style="display:flex;flex-wrap:wrap;gap:.5rem" id="build-btns"><!-- populated by JS --></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title" id="task-title">📋 Task Output</div>
+            <span id="task-status" style="font-size:.75rem;color:var(--muted)">Idle</span>
+          </div>
+          <div class="card-body">
+            <div class="task-output" id="task-output">Chưa có task nào được chạy...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW: GIT -->
+      <div id="view-git" class="view">
+        <div class="card">
+          <div class="card-header"><div class="card-title">🔄 Git Operations</div></div>
+          <div class="card-body" style="display:flex;flex-direction:column;gap:.75rem">
+            <div style="display:flex;gap:.5rem">
+              <button class="btn btn-warning" onclick="runGitPull()">🔄 git pull --rebase</button>
+              <button class="btn btn-ghost" onclick="loadGitStatus()">📋 git status</button>
+            </div>
+            <div class="git-output" id="git-output">Nhấn nút để xem status...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW: SYSTEM -->
+      <div id="view-system" class="view">
+        <div class="card">
+          <div class="card-header"><div class="card-title">💻 System Information</div></div>
+          <div class="card-body">
+            <div class="sys-grid" id="sys-grid">Loading...</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end panel-area -->
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast-container"></div>
+
+<script>
+// ─── STATE ───────────────────────────────────────────────
+let apps = [];
+let appStates = {};
+let allLogs = {}; // appId → [lines]
+let activeLogApp = null;
+let autoScroll = true;
+let ws = null;
+let currentTaskId = null;
+let envData = { active: 'local', envs: {} };
+let currentEnvScope = 'global'; // 'global' or appId (e.g. 'mfe-pos')
+let selectedEnvMode = 'local';
+let currentAppEnvData = null;
+
+// ─── INIT ────────────────────────────────────────────────
+async function init() {
+  apps = await fetch('/api/apps').then(r => r.json());
+  buildAppsGrid();
+  buildLogTabs();
+  buildBuildBtns();
+  await loadEnv();
+  connectWs();
+}
+
+// ─── WEBSOCKET ───────────────────────────────────────────
+function connectWs() {
+  ws = new WebSocket(`ws://${location.host}`);
+  ws.onopen = () => {
+    document.getElementById('ws-dot').classList.add('connected');
+    document.getElementById('ws-label').textContent = 'Live';
+  };
+  ws.onclose = () => {
+    document.getElementById('ws-dot').classList.remove('connected');
+    document.getElementById('ws-label').textContent = 'Disconnected';
+    setTimeout(connectWs, 2000);
+  };
+  ws.onmessage = (e) => {
+    const msg = JSON.parse(e.data);
+    handleMsg(msg);
+  };
+}
+
+function handleMsg(msg) {
+  switch (msg.type) {
+    case 'init':
+      appStates = msg.state;
+      Object.keys(msg.state).forEach(id => updateAppCard(id, msg.state[id]));
+      break;
+    case 'status':
+      appStates[msg.appId] = { status: msg.status, pid: msg.pid };
+      updateAppCard(msg.appId, { status: msg.status, pid: msg.pid });
+      break;
+    case 'log':
+      appendLog(msg.appId, msg.line);
+      break;
+    case 'env_change':
+      loadEnv();
+      toast(`🌐 Môi trường đã chuyển sang ${msg.active.toUpperCase()}`, 'info');
+      break;
+    case 'task_start':
+      currentTaskId = msg.taskId;
+      document.getElementById('task-title').textContent = msg.label;
+      document.getElementById('task-status').textContent = '🔄 Running...';
+      document.getElementById('task-output').textContent = '';
+      showView('tasks', document.querySelector('[onclick*="tasks"]'));
+      break;
+    case 'task_log':
+      if (msg.taskId === currentTaskId) {
+        const el = document.getElementById('task-output');
+        el.textContent += msg.line + '\n';
+        el.scrollTop = el.scrollHeight;
+      }
+      break;
+    case 'task_done':
+      if (msg.taskId === currentTaskId) {
+        const ok = msg.code === 0;
+        document.getElementById('task-status').textContent = ok ? '✅ Done' : `❌ Failed (code ${msg.code})`;
+        toast(ok ? `Task completed successfully!` : `Task failed (code ${msg.code})`, ok ? 'success' : 'error');
+      }
+      break;
+  }
+}
+
+// ─── ENVIRONMENT MANAGER ─────────────────────────────────
+async function loadEnv() {
+  try {
+    envData = await fetch('/api/env').then(r => r.json());
+  } catch (e) {
+    envData = { active: 'local', envs: {} };
+  }
+  updateEnvHeaderBadge(envData.active || 'local');
+  updateEnvCardBadges();
+  if (currentEnvScope === 'global') {
+    selectEnvTab(selectedEnvMode || envData.active || 'local');
+  } else {
+    selectEnvScope(currentEnvScope);
+  }
+}
+
+function updateEnvHeaderBadge(active) {
+  const iconMap = { local: '🟢', development: '🟡', staging: '🔵', production: '🔴' };
+  document.getElementById('env-badge-icon').textContent = iconMap[active] || '🟢';
+  document.getElementById('env-badge-text').textContent = (active || 'local').toUpperCase() + ' ENV';
+}
+
+function updateEnvCardBadges() {
+  ['local', 'development', 'staging', 'production'].forEach(mode => {
+    const tag = document.getElementById(`env-tag-${mode}`);
+    if (tag) {
+      if (envData.active === mode) {
+        tag.className = 'env-badge-tag active-env';
+        tag.textContent = 'ACTIVE';
+      } else {
+        tag.className = '';
+        tag.textContent = '';
+      }
+    }
+  });
+}
+
+function selectEnvScope(scope) {
+  currentEnvScope = scope;
+  document.querySelectorAll('.env-scope-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(`scope-${scope}`)?.classList.add('active');
+
+  const cardsArea = document.getElementById('global-env-cards-area');
+  const actionBtns = document.getElementById('env-action-buttons');
+
+  if (scope === 'global') {
+    cardsArea.style.display = 'block';
+    selectEnvTab(selectedEnvMode || 'local');
+  } else {
+    cardsArea.style.display = 'none';
+    loadAppEnv(scope);
+  }
+}
+
+async function loadAppEnv(appId) {
+  try {
+    currentAppEnvData = await fetch(`/api/env/app/${appId}`).then(r => r.json());
+    document.getElementById('env-editor-label').textContent = `File: ${currentAppEnvData.path}`;
+    
+    const badge = document.getElementById('env-viewing-badge');
+    if (badge) {
+      badge.textContent = currentAppEnvData.isSynced ? '🟢 SYNCED WITH ROOT' : '🟡 CUSTOM OVERRIDE ACTIVE';
+      badge.style.background = currentAppEnvData.isSynced ? 'rgba(16,185,129,0.15)' : 'rgba(245,158,11,0.15)';
+      badge.style.color = currentAppEnvData.isSynced ? 'var(--green)' : 'var(--amber)';
+    }
+
+    const actionBtns = document.getElementById('env-action-buttons');
+    actionBtns.innerHTML = `
+      <button class="btn btn-success btn-sm" onclick="saveAppEnv('${appId}')">💾 Save ${appId}/.env</button>
+      <button class="btn btn-ghost btn-sm" onclick="resetAppEnvToRoot('${appId}')">🔄 Reset to Root Env</button>
+      <button class="btn btn-ghost btn-sm" onclick="copyEnvText()">📋 Copy</button>
+      <button class="btn btn-ghost btn-sm" onclick="loadAppEnv('${appId}')">🔄 Reload</button>
+    `;
+
+    document.getElementById('env-editor-textarea').value = currentAppEnvData.content || '';
+  } catch (e) {
+    toast(`Không thể nạp .env cho ${appId}`, 'error');
+  }
+}
+
+async function saveAppEnv(appId) {
+  const content = document.getElementById('env-editor-textarea').value;
+  await fetch(`/api/env/app/${appId}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ content })
+  });
+  toast(`💾 Đã lưu cấu hình riêng cho ${appId}/.env`, 'success');
+  loadAppEnv(appId);
+}
+
+async function resetAppEnvToRoot(appId) {
+  if (!confirm(`Bạn có chắc muốn ghi đè ${appId}/.env bằng nội dung root .env hiện tại?`)) return;
+  const rootContent = envData.envs[envData.active] || '';
+  document.getElementById('env-editor-textarea').value = rootContent;
+  await saveAppEnv(appId);
+  toast(`🔄 Đã đồng bộ ${appId}/.env về chuẩn Root!`, 'success');
+}
+
+function selectEnvTab(mode) {
+  selectedEnvMode = mode;
+  document.querySelectorAll('.env-card').forEach(c => c.classList.remove('active-tab'));
+  const card = document.getElementById(`env-card-${mode}`);
+  if (card) card.classList.add('active-tab');
+
+  const filename = mode === 'local' ? '.env.local' : `.env.${mode}`;
+  const isActive = envData.active === mode;
+  
+  document.getElementById('env-editor-label').textContent = `File: ${filename}`;
+  const viewingBadge = document.getElementById('env-viewing-badge');
+  if (viewingBadge) {
+    viewingBadge.textContent = isActive ? 'ACTIVE RUNNING' : 'VIEWING / DRAFT';
+    viewingBadge.style.background = isActive ? 'rgba(16,185,129,0.15)' : 'rgba(245,158,11,0.15)';
+    viewingBadge.style.color = isActive ? 'var(--green)' : 'var(--amber)';
+  }
+
+  const actionBtns = document.getElementById('env-action-buttons');
+  actionBtns.innerHTML = `
+    <button class="btn ${isActive ? 'btn-ghost' : 'btn-primary'} btn-sm" onclick="applyActiveEnv('${mode}')">
+      ${isActive ? '✅ Currently Active' : `⚡ Apply ${mode.toUpperCase()} as Active`}
+    </button>
+    <button class="btn btn-success btn-sm" onclick="saveEnvContent()">💾 Save File</button>
+    <button class="btn btn-ghost btn-sm" onclick="copyEnvText()">📋 Copy</button>
+    <button class="btn btn-ghost btn-sm" onclick="loadEnv()">🔄 Reload</button>
+  `;
+
+  const textarea = document.getElementById('env-editor-textarea');
+  if (textarea) {
+    textarea.value = envData.envs[mode] || '';
+  }
+}
+
+async function applyActiveEnv(mode) {
+  const r = await fetch('/api/env/switch', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ mode })
+  }).then(r => r.json());
+  if (r.ok) {
+    await loadEnv();
+    toast(`⚡ Đã kích hoạt môi trường ${mode.toUpperCase()} và đồng bộ toàn bộ 7 apps!`, 'success');
+  }
+}
+
+async function saveEnvContent() {
+  const content = document.getElementById('env-editor-textarea').value;
+  const r = await fetch('/api/env/save', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ mode: selectedEnvMode, content })
+  }).then(r => r.json());
+  if (r.ok) {
+    envData.envs[selectedEnvMode] = content;
+    toast(`💾 Đã lưu thay đổi vào .env.${selectedEnvMode}`, 'success');
+  }
+}
+
+async function syncEnvToAll() {
+  await fetch('/api/env/sync', { method: 'POST' });
+  toast('🔄 Đã đồng bộ root .env vào tất cả 7 apps!', 'success');
+}
+
+async function copyEnvText() {
+  const content = document.getElementById('env-editor-textarea').value;
+  await navigator.clipboard.writeText(content);
+  toast('📋 Đã copy nội dung env vào clipboard!', 'success');
+}
+
+// ─── APP GRID & PRESETS ──────────────────────────────────
+function buildAppsGrid() {
+  const grid = document.getElementById('apps-grid');
+  grid.innerHTML = apps.map(a => `
+    <div class="app-card" id="card-${a.id}">
+      <div class="app-card-header">
+        <div class="app-color-bar" style="background:${a.color}"></div>
+        <div class="app-icon">${a.icon}</div>
+        <div class="app-info">
+          <div class="app-name">${a.name}</div>
+          <div class="app-port">:${a.port} · ${a.filter}</div>
+        </div>
+        <div id="badge-${a.id}" class="status-badge stopped"><div class="status-dot"></div> stopped</div>
+      </div>
+      <div class="app-card-body">
+        <div class="app-card-actions">
+          <button class="btn btn-success btn-sm" onclick="startApp('${a.id}')">▶ Start</button>
+          <button class="btn btn-danger btn-sm" onclick="stopApp('${a.id}')">⏹ Stop</button>
+          <button class="btn btn-ghost btn-sm" onclick="restartApp('${a.id}')">🔄</button>
+          <button class="btn btn-ghost btn-sm" onclick="openUrl('http://localhost:${a.port}')">🔗</button>
+          <button class="btn btn-ghost btn-sm" onclick="viewAppLogs('${a.id}')">📜</button>
+        </div>
+        <div style="font-size:.6875rem;color:var(--muted)" id="pid-${a.id}"></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function updateAppCard(appId, state) {
+  const badge = document.getElementById(`badge-${appId}`);
+  const pid = document.getElementById(`pid-${appId}`);
+  const card = document.getElementById(`card-${appId}`);
+  if (!badge) return;
+
+  badge.className = `status-badge ${state.status}`;
+  badge.innerHTML = `<div class="status-dot"></div> ${state.status}`;
+  if (pid) pid.textContent = state.pid ? `PID: ${state.pid}` : '';
+
+  const app = apps.find(a => a.id === appId);
+  if (card && app) {
+    card.style.borderColor = state.status === 'running' ? app.color + '55' : '';
+  }
+}
+
+async function startPreset(preset) {
+  showView('apps', document.querySelector('[onclick*="apps"]'));
+  await fetch(`/api/preset/${preset}`, { method: 'POST' });
+  const names = {
+    pos: '🛒 POS Workspace (Shell + Auth + POS)',
+    erp: '📊 ERP Suite (Shell + Auth + ERP + Catalog + Users)',
+    marketing: '🌐 Marketing Landing',
+    core: '⚡ Core Host + Auth'
+  };
+  toast(`▶ Đang bật preset tiết kiệm RAM: ${names[preset] || preset}...`, 'info');
+  setTimeout(refreshPorts, 2500);
+}
+
+// ─── LOG MANAGEMENT ─────────────────────────────────────
+function buildLogTabs() {
+  const tabs = document.getElementById('log-tabs');
+  tabs.innerHTML = apps.map((a, i) => `
+    <button class="log-tab ${i===0?'active':''}" id="tab-${a.id}" onclick="switchLogTab('${a.id}')">${a.icon} ${a.name}</button>
+  `).join('');
+  activeLogApp = apps[0]?.id;
+  apps.forEach(a => { allLogs[a.id] = []; });
+}
+
+function switchLogTab(appId) {
+  activeLogApp = appId;
+  document.querySelectorAll('.log-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(`tab-${appId}`)?.classList.add('active');
+  renderLogBody();
+}
+
+function appendLog(appId, line) {
+  if (!allLogs[appId]) allLogs[appId] = [];
+  allLogs[appId].push(line);
+  if (allLogs[appId].length > 1000) allLogs[appId].shift();
+
+  const tab = document.getElementById(`tab-${appId}`);
+  if (tab && appId !== activeLogApp) {
+    if (!tab.querySelector('.badge')) {
+      const b = document.createElement('div');
+      b.className = 'badge'; tab.appendChild(b);
+    }
+  }
+
+  if (appId === activeLogApp) {
+    const body = document.getElementById('log-body');
+    const filter = document.getElementById('log-filter').value.toLowerCase();
+    if (!filter || line.toLowerCase().includes(filter)) {
+      const div = document.createElement('div');
+      div.className = 'log-line' + (line.includes('Error') || line.includes('error') || line.includes('❌') ? ' error-line' : '') + (line.includes('✅') || line.includes('started') ? ' success-line' : '') + (line.includes('▶') || line.includes('ℹ') ? ' info-line' : '');
+      div.textContent = line;
+      body.appendChild(div);
+      if (body.children.length > 500) body.removeChild(body.firstChild);
+      if (autoScroll) body.scrollTop = body.scrollHeight;
+    }
+  }
+}
+
+function renderLogBody() {
+  const body = document.getElementById('log-body');
+  const filter = document.getElementById('log-filter').value.toLowerCase();
+  const lines = (allLogs[activeLogApp] || []).filter(l => !filter || l.toLowerCase().includes(filter));
+  body.innerHTML = lines.map(l => `<div class="log-line ${l.includes('Error')||l.includes('❌')?'error-line':''} ${l.includes('✅')||l.includes('started')?'success-line':''}">${escHtml(l)}</div>`).join('');
+  if (autoScroll) body.scrollTop = body.scrollHeight;
+  const tab = document.getElementById(`tab-${activeLogApp}`);
+  tab?.querySelector('.badge')?.remove();
+}
+
+function filterLogs() { renderLogBody(); }
+function clearLogs() { if (activeLogApp) { allLogs[activeLogApp] = []; renderLogBody(); } }
+function toggleAutoScroll() {
+  autoScroll = !autoScroll;
+  document.getElementById('autoscroll-label').textContent = `Auto-scroll ${autoScroll?'ON':'OFF'}`;
+}
+async function copyLogs() {
+  const lines = allLogs[activeLogApp] || [];
+  if (lines.length === 0) {
+    toast('Chưa có log để copy', 'info');
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(lines.join('\n'));
+    toast('📋 Đã copy log vào clipboard!', 'success');
+  } catch {
+    const textarea = document.createElement('textarea');
+    textarea.value = lines.join('\n');
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    textarea.remove();
+    toast('📋 Đã copy log vào clipboard!', 'success');
+  }
+}
+function downloadLogs() {
+  const lines = allLogs[activeLogApp] || [];
+  const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${activeLogApp}-logs-${Date.now()}.txt`;
+  a.click();
+}
+function viewAppLogs(appId) {
+  showView('logs', document.querySelector('[onclick*="logs"]'));
+  switchLogTab(appId);
+}
+function escHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ─── API CALLS ───────────────────────────────────────────
+async function startApp(id) {
+  await fetch(`/api/app/${id}/start`, { method: 'POST' });
+  toast(`▶ Starting ${appName(id)}...`, 'info');
+}
+async function stopApp(id) {
+  await fetch(`/api/app/${id}/stop`, { method: 'POST' });
+  toast(`⏹ Stopping ${appName(id)}...`, 'info');
+}
+async function restartApp(id) {
+  await fetch(`/api/app/${id}/restart`, { method: 'POST' });
+  toast(`🔄 Restarting ${appName(id)}...`, 'info');
+}
+async function allStart() {
+  showView('apps', document.querySelector('[onclick*="apps"]'));
+  await fetch('/api/all/start', { method: 'POST' });
+  toast('▶ Đang khởi động toàn bộ 7 Micro Frontend Apps...', 'info');
+  setTimeout(refreshPorts, 2000);
+}
+async function allStop() {
+  await fetch('/api/all/stop', { method: 'POST' });
+  toast('⏹ Đã dừng toàn bộ apps.', 'info');
+  setTimeout(refreshPorts, 1000);
+}
+async function runInstall() {
+  await fetch('/api/install', { method: 'POST' });
+  toast('📦 Running pnpm install...', 'info');
+}
+async function runBuildPkgs() {
+  await fetch('/api/packages/build', { method: 'POST' });
+  toast('⚙️ Building shared packages...', 'info');
+}
+async function runTypecheck() {
+  await fetch('/api/typecheck', { method: 'POST' });
+  toast('🔎 Running type-check...', 'info');
+}
+async function runLint() {
+  await fetch('/api/lint', { method: 'POST' });
+  toast('✨ Running ESLint...', 'info');
+}
+async function runClean() {
+  if (!confirm('Xóa toàn bộ build artifacts (dist, .next, .output,...)?')) return;
+  await fetch('/api/clean', { method: 'POST' });
+  toast('🧹 Cleaning artifacts...', 'info');
+}
+async function runGitPull() {
+  await fetch('/api/git/pull', { method: 'POST' });
+  showView('git', document.querySelector('[onclick*="git"]'));
+  toast('🔄 Running git pull...', 'info');
+}
+async function loadGitStatus() {
+  const r = await fetch('/api/git/status').then(r => r.json());
+  document.getElementById('git-output').textContent = r.output || '(no output)';
+}
+async function refreshPorts() {
+  const r = await fetch('/api/ports').then(r => r.json());
+  const body = document.getElementById('ports-body');
+  body.innerHTML = apps.map(a => `
+    <div class="port-row">
+      <div class="port-num">:${a.port}</div>
+      <div class="app-icon">${a.icon}</div>
+      <div class="port-name">${a.name}</div>
+      <div class="port-status">
+        ${r[a.id] ? '<span class="chip-open">● OPEN</span>' : '<span class="chip-closed">○ CLOSED</span>'}
+      </div>
+      ${r[a.id] ? `<button class="btn btn-ghost btn-sm" onclick="openUrl('http://localhost:${a.port}')">Open →</button>` : ''}
+    </div>
+  `).join('');
+}
+async function loadSystem() {
+  const s = await fetch('/api/system').then(r => r.json());
+  const memPct = Math.round((1 - s.freeMem / s.totalMem) * 100);
+  document.getElementById('sys-grid').innerHTML = `
+    <div class="sys-card"><div class="sys-label">Platform</div><div class="sys-value" style="font-size:.875rem">${s.platform}</div></div>
+    <div class="sys-card"><div class="sys-label">Node.js</div><div class="sys-value" style="font-size:.875rem">${s.nodeVersion}</div></div>
+    <div class="sys-card"><div class="sys-label">CPU Cores</div><div class="sys-value">${s.cpus}</div></div>
+    <div class="sys-card">
+      <div class="sys-label">RAM Used</div>
+      <div class="sys-value">${memPct}%</div>
+      <div class="sys-sub">${fmtMB(s.totalMem - s.freeMem)} / ${fmtMB(s.totalMem)}</div>
+      <div class="progress-track" style="margin-top:.5rem"><div class="progress-bar" style="width:${memPct}%;background:${memPct>80?'var(--red)':memPct>60?'var(--amber)':'var(--green)'}"></div></div>
+    </div>
+    <div class="sys-card"><div class="sys-label">Uptime</div><div class="sys-value" style="font-size:.875rem">${fmtUptime(s.uptime)}</div></div>
+    ${s.loadAvg.length ? `<div class="sys-card"><div class="sys-label">Load Avg</div><div class="sys-value" style="font-size:.875rem">${s.loadAvg.map(l=>l.toFixed(2)).join(' / ')}</div></div>` : ''}
+  `;
+}
+
+// ─── BUILD BUTTONS ────────────────────────────────────────
+function buildBuildBtns() {
+  document.getElementById('build-btns').innerHTML = apps.map(a =>
+    `<button class="btn btn-ghost btn-sm" onclick="buildApp('${a.id}')">${a.icon} ${a.name}</button>`
+  ).join('');
+}
+async function buildApp(id) {
+  await fetch(`/api/app/${id}/build`, { method: 'POST' });
+  toast(`🔨 Building ${appName(id)}...`, 'info');
+  showView('tasks', document.querySelector('[onclick*="tasks"]'));
+}
+
+// ─── UI HELPERS ──────────────────────────────────────────
+function showView(viewName, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(`view-${viewName}`)?.classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  btn?.classList.add('active');
+}
+function openUrl(url) { window.open(url, '_blank'); }
+function appName(id) { return apps.find(a => a.id === id)?.name || id; }
+function fmtMB(b) { return (b / 1024 / 1024).toFixed(0) + ' MB'; }
+function fmtUptime(s) {
+  const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60);
+  return `${h}h ${m}m`;
+}
+function toast(msg, type = 'info') {
+  const c = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.textContent = msg;
+  c.appendChild(t);
+  setTimeout(() => { t.style.animation = 'toast-out .25s ease forwards'; setTimeout(() => t.remove(), 250); }, 3000);
+}
+
+// ─── BOOT ────────────────────────────────────────────────
+init();
+setInterval(refreshPorts, 3000);
+</script>
+</body>
+</html>

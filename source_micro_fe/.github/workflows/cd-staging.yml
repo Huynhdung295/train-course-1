@@ -1,0 +1,72 @@
+name: CD – Deploy Staging
+
+on:
+  push:
+    branches: [develop]
+
+jobs:
+  deploy-staging:
+    name: Deploy to Staging VPS
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+      url: https://staging.nexus-erp.vn
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with: { version: 9 }
+
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+
+      - name: Install & Build
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm turbo run build
+        env:
+          NEXT_PUBLIC_API_BASE_URL: ${{ secrets.STAGING_API_URL }}
+          NEXT_PUBLIC_MFE_AUTH_URL: ${{ secrets.STAGING_MFE_AUTH_URL }}
+          NEXT_PUBLIC_MFE_POS_URL: ${{ secrets.STAGING_MFE_POS_URL }}
+          NEXT_PUBLIC_MFE_ERP_URL: ${{ secrets.STAGING_MFE_ERP_URL }}
+          NEXT_PUBLIC_MFE_CATALOG_URL: ${{ secrets.STAGING_MFE_CATALOG_URL }}
+          NEXT_PUBLIC_MFE_USERS_URL: ${{ secrets.STAGING_MFE_USERS_URL }}
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+
+      - name: Deploy Shell (Next.js) via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            cd /opt/nexus/source_micro_fe
+            git pull origin develop
+            pnpm install --frozen-lockfile
+            pnpm --filter @nexus/shell build
+            pm2 restart nexus-shell || pm2 start npm --name "nexus-shell" -- start -- --prefix apps/shell
+            pnpm --filter @nexus/mfe-erp build
+            pm2 restart nexus-mfe-erp || pm2 start npm --name "nexus-mfe-erp" -- start -- --prefix apps/mfe-erp
+            pnpm --filter @nexus/mfe-catalog build
+            pm2 restart nexus-mfe-catalog || pm2 start npm --name "nexus-mfe-catalog" -- start -- --prefix apps/mfe-catalog
+            pm2 save
+
+      - name: Deploy static MFE builds to Nginx
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            cd /opt/nexus/source_micro_fe
+            cp -r apps/mfe-auth/dist/* /var/www/nexus/mfe-auth/
+            cp -r apps/mfe-pos/dist/* /var/www/nexus/mfe-pos/
+            cp -r apps/mfe-users/dist/* /var/www/nexus/mfe-users/
+            cp -r apps/mfe-marketing/dist/* /var/www/nexus/mfe-marketing/
+            sudo nginx -t && sudo systemctl reload nginx
+
+      - name: Notify
+        if: always()
+        run: echo "Staging deployment ${{ job.status }}"

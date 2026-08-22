@@ -1,0 +1,74 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const AUTH_URL = 'http://localhost:3000/login';
+const REGISTER_URL = 'http://localhost:3000/register';
+---
+<BaseLayout title="Nền tảng ERP thế hệ mới">
+  <!-- Header -->
+  <header style="padding: 1.5rem 2rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08);">
+    <div style="font-size: 1.25rem; font-weight: 800; background: linear-gradient(135deg, #3b82f6, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Nexus ERP</div>
+    <nav style="display: flex; gap: 2rem;">
+      <a href="/features" style="color: #94a3b8; text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='#f8fafc'" onmouseout="this.style.color='#94a3b8'">Tính năng</a>
+      <a href="/pricing" style="color: #94a3b8; text-decoration: none; font-size: 0.875rem; font-weight: 500;" onmouseover="this.style.color='#f8fafc'" onmouseout="this.style.color='#94a3b8'">Bảng giá</a>
+      <a href="/blog" style="color: #94a3b8; text-decoration: none; font-size: 0.875rem; font-weight: 500;" onmouseover="this.style.color='#f8fafc'" onmouseout="this.style.color='#94a3b8'">Blog</a>
+    </nav>
+    <a href={AUTH_URL} style="background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; padding: 0.625rem 1.5rem; border-radius: 0.75rem; font-size: 0.875rem; font-weight: 600; text-decoration: none;">Đăng nhập</a>
+  </header>
+
+  <!-- Hero -->
+  <section style="padding: 8rem 2rem; text-align: center; max-width: 900px; margin: 0 auto;">
+    <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.3); border-radius: 9999px; padding: 0.375rem 1rem; margin-bottom: 2rem;">
+      <span style="width: 0.5rem; height: 0.5rem; border-radius: 9999px; background: #3b82f6; animation: pulse 2s infinite;"></span>
+      <span style="font-size: 0.75rem; font-weight: 600; color: #93c5fd;">Phiên bản 2026 – Micro Frontend Architecture</span>
+    </div>
+
+    <h1 style="font-size: clamp(2.5rem, 6vw, 5rem); font-weight: 900; line-height: 1.1; margin-bottom: 1.5rem;">
+      <span style="background: linear-gradient(135deg, #f8fafc 0%, #94a3b8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Quản lý doanh nghiệp</span><br />
+      <span style="background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">thế hệ mới</span>
+    </h1>
+
+    <p style="font-size: 1.25rem; color: #94a3b8; max-width: 600px; margin: 0 auto 3rem; line-height: 1.7;">
+      Nền tảng ERP đa chi nhánh, realtime, tích hợp POS thông minh – xây dựng trên kiến trúc Micro Frontend hiện đại nhất.
+    </p>
+
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+      <a href={REGISTER_URL} style="background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; padding: 1rem 2.5rem; border-radius: 0.875rem; font-weight: 700; font-size: 1rem; text-decoration: none; box-shadow: 0 4px 24px rgba(59,130,246,0.4);">
+        Dùng thử miễn phí →
+      </a>
+      <a href="/features" style="border: 2px solid rgba(255,255,255,0.1); color: #f8fafc; padding: 1rem 2.5rem; border-radius: 0.875rem; font-weight: 600; font-size: 1rem; text-decoration: none; backdrop-filter: blur(8px);">
+        Xem tính năng
+      </a>
+    </div>
+  </section>
+
+  <!-- Features Grid -->
+  <section style="padding: 4rem 2rem; max-width: 1100px; margin: 0 auto;">
+    <h2 style="text-align: center; font-size: 2rem; font-weight: 800; margin-bottom: 3rem; color: #f8fafc;">Tất cả trong một nền tảng</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+      {[
+        { icon: '🏪', title: 'POS Realtime', desc: 'Quản lý bán hàng tức thì với saga pattern và SSE.' },
+        { icon: '📊', title: 'Dashboard Analytics', desc: 'Biểu đồ doanh thu realtime, báo cáo chi tiết.' },
+        { icon: '📦', title: 'Quản lý kho', desc: 'Optimistic locking, tránh xung đột dữ liệu.' },
+        { icon: '👥', title: 'Phân quyền ABAC', desc: 'Kiểm soát truy cập chi tiết theo thuộc tính.' },
+        { icon: '🔐', title: 'Bảo mật cao', desc: 'Passkey, MFA TOTP, JWT với refresh token.' },
+        { icon: '🌐', title: 'Multi-tenant', desc: 'Mỗi doanh nghiệp có không gian dữ liệu riêng.' },
+      ].map(({ icon, title, desc }) => (
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 1rem; padding: 1.75rem;">
+          <div style="font-size: 2.5rem; margin-bottom: 1rem;">{icon}</div>
+          <h3 style="font-size: 1.125rem; font-weight: 700; color: #f8fafc; margin-bottom: 0.5rem;">{title}</h3>
+          <p style="color: #64748b; font-size: 0.875rem; line-height: 1.6;">{desc}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer style="border-top: 1px solid rgba(255,255,255,0.08); padding: 2rem; text-align: center; color: #475569; font-size: 0.875rem; margin-top: 4rem;">
+    © 2026 Nexus ERP. Bảo lưu mọi quyền.
+  </footer>
+
+  <style>
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+  </style>
+</BaseLayout>

@@ -1,0 +1,62 @@
+name: CD – Deploy Production
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://nexus-erp.vn
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with: { version: 9 }
+
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+
+      - name: Install & Build
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm turbo run build
+        env:
+          NEXT_PUBLIC_API_BASE_URL: ${{ secrets.PROD_API_URL }}
+          NEXT_PUBLIC_MFE_AUTH_URL: ${{ secrets.PROD_MFE_AUTH_URL }}
+          NEXT_PUBLIC_MFE_POS_URL: ${{ secrets.PROD_MFE_POS_URL }}
+          NEXT_PUBLIC_MFE_ERP_URL: ${{ secrets.PROD_MFE_ERP_URL }}
+          NEXT_PUBLIC_MFE_CATALOG_URL: ${{ secrets.PROD_MFE_CATALOG_URL }}
+          NEXT_PUBLIC_MFE_USERS_URL: ${{ secrets.PROD_MFE_USERS_URL }}
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+
+      - name: Deploy to Production VPS
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.PROD_VPS_HOST }}
+          username: ${{ secrets.PROD_VPS_USER }}
+          key: ${{ secrets.PROD_VPS_SSH_KEY }}
+          script: |
+            cd /opt/nexus/source_micro_fe
+            git fetch --tags
+            git checkout ${{ github.ref_name }}
+            pnpm install --frozen-lockfile
+            pnpm turbo run build
+            pm2 restart nexus-shell nexus-mfe-erp nexus-mfe-catalog
+            cp -r apps/mfe-auth/dist/* /var/www/nexus/mfe-auth/
+            cp -r apps/mfe-pos/dist/* /var/www/nexus/mfe-pos/
+            cp -r apps/mfe-users/dist/* /var/www/nexus/mfe-users/
+            cp -r apps/mfe-marketing/dist/* /var/www/nexus/mfe-marketing/
+            sudo nginx -t && sudo systemctl reload nginx
+            pm2 save
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true

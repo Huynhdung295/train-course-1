@@ -1,0 +1,6 @@
+{
+  "extends": "../../tooling/tsconfig/react.json",
+  "compilerOptions": { "baseUrl": ".", "paths": { "@/*": ["./src/*"] }, "plugins": [{ "name": "next" }] },
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "exclude": ["node_modules", ".next"]
+}

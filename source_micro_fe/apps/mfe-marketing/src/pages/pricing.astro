@@ -1,0 +1,36 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+const plans = [
+  { name: 'Free', price: 0, features: ['1 chi nhánh', '2 nhân viên', 'POS cơ bản', 'Hỗ trợ email'], cta: 'Bắt đầu miễn phí', highlighted: false },
+  { name: 'Pro', price: 990000, features: ['5 chi nhánh', '20 nhân viên', 'POS + Analytics', 'MFA & Passkey', 'Hỗ trợ 24/7'], cta: 'Dùng thử 14 ngày', highlighted: true },
+  { name: 'Enterprise', price: null, features: ['Không giới hạn', 'ABAC phân quyền', 'SSO & Audit log', 'SLA 99.9%', 'Tư vấn triển khai'], cta: 'Liên hệ sales', highlighted: false },
+];
+---
+<BaseLayout title="Bảng giá" description="Lựa chọn gói phù hợp với quy mô doanh nghiệp của bạn.">
+  <div style="min-height: 100vh; padding: 5rem 2rem;">
+    <div style="max-width: 1000px; margin: 0 auto;">
+      <h1 style="text-align: center; font-size: 2.5rem; font-weight: 900; color: #f8fafc; margin-bottom: 1rem;">Bảng giá</h1>
+      <p style="text-align: center; color: #64748b; margin-bottom: 4rem;">Minh bạch, không phí ẩn.</p>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; align-items: start;">
+        {plans.map(({ name, price, features, cta, highlighted }) => (
+          <div style={`background: ${highlighted ? 'linear-gradient(135deg, rgba(59,130,246,0.15), rgba(139,92,246,0.1))' : 'rgba(255,255,255,0.03)'}; border: ${highlighted ? '2px solid #3b82f6' : '1px solid rgba(255,255,255,0.08)'}; border-radius: 1.25rem; padding: 2rem; position: relative;`}>
+            {highlighted && <div style="position: absolute; top: -0.75rem; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg,#3b82f6,#8b5cf6); color: white; font-size: 0.7rem; font-weight: 700; padding: 0.25rem 1rem; border-radius: 9999px;">PHỔ BIẾN NHẤT</div>}
+            <h2 style="font-size: 1.25rem; font-weight: 800; color: #f8fafc; margin-bottom: 0.5rem;">{name}</h2>
+            <div style="margin-bottom: 1.5rem;">
+              {price !== null ? (
+                <span style="font-size: 2rem; font-weight: 900; color: #3b82f6;">{new Intl.NumberFormat('vi-VN').format(price)}₫<span style="font-size: 0.875rem; color: #64748b; font-weight: 400;">/tháng</span></span>
+              ) : (
+                <span style="font-size: 1.5rem; font-weight: 700; color: #8b5cf6;">Tùy chỉnh</span>
+              )}
+            </div>
+            <ul style="list-style: none; space-y: 0.75rem; margin-bottom: 2rem;">
+              {features.map((f) => <li style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: #94a3b8; margin-bottom: 0.625rem;"><span style="color: #10b981;">✓</span>{f}</li>)}
+            </ul>
+            <a href="http://localhost:3000/login" style={`display: block; text-align: center; padding: 0.875rem; border-radius: 0.75rem; font-weight: 700; font-size: 0.875rem; text-decoration: none; ${highlighted ? 'background: linear-gradient(135deg,#3b82f6,#2563eb); color: white;' : 'border: 1px solid rgba(255,255,255,0.1); color: #f8fafc;'}`}>{cta}</a>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</BaseLayout>
